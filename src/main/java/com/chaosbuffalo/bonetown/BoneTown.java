@@ -15,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,6 +48,7 @@ public class BoneTown
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        LOGGER.info(new Vector2D(1, 2).toString());
         String path = "assets" + File.separator + "bonetown" + File.separator + "models";
         try {
             AssimpMesh[] meshes = StaticMeshLoader.load("untitlted.fbx", path);

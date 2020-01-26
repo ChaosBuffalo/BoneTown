@@ -3,6 +3,9 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
 
     }
     dependencies {
@@ -27,6 +30,7 @@ repositories {
     jcenter()
     mavenCentral()
 }
+
 
 configurations {
     // configuration that holds jars to embed inside the jar
@@ -106,7 +110,10 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.15.2-31.0.1'
-    embed group: 'org.lwjgl', name: 'lwjgl-assimp', version: '3.1.5'
+    shadow (group: 'org.lwjgl', name: 'lwjgl-assimp', version: '3.2.2'){
+        exclude group: 'org.lwjgl', module: 'lwjgl'
+    }
+    shadow group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
 
 
@@ -130,6 +137,27 @@ dependencies {
 
 }
 
+//task generateMetaFiles {
+//    // Code for execution after the whole buildscript was parsed and loaded
+//    doLast {
+//        // Clear the dependencyMeta directory since we don't want old dependencies to still be listed in there
+//        file("${buildDir}/dependencyMeta/").deleteDir()
+//        configurations.embed.resolvedConfiguration.resolvedArtifacts.each {
+//            // Create a meta file for each dependency in a specified directory
+//            def metaFile = file("${buildDir}/dependencyMeta/${it.file.name}.meta")
+//            metaFile.parentFile.mkdirs()
+//            // Use the Gradle notation provided by the API ('group:artifact:version') for the meta file...
+//            def artifactRef = it.moduleVersion.toString()
+//            // ...and append the classifier if present
+//            if (it.classifier != null) {
+//                artifactRef += ":${it.classifier}"
+//            }
+//            // Write the artifact information to the meta file, to be used by the
+//            metaFile.text = "Maven-Artifact: $artifactRef"
+//        }
+//    }
+//}
+
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
@@ -144,31 +172,36 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
         ])
     }
-    into('/META-INF/libraries') {
-        from configurations.embed
-    }
-    doFirst {
-        manifest {
-            def contained = configurations.embed.collect { it.getName() };
-            if (!contained.isEmpty()) {
-                attributes([
-                        "ContainedDeps": contained.join(' ')
-                ])
-            }
-        }
-    }
+//    into('/META-INF/libraries') {
+//        from configurations.embed
+//        from "${buildDir}/dependencyMeta/"
+//    }
+//    doFirst {
+//        manifest {
+//            def contained = configurations.embed.collect { it.getName() };
+//            if (!contained.isEmpty()) {
+//                attributes([
+//                        "ContainedDeps": contained.join(' ')
+//                ])
+//            }
+//        }
+//    }
+//    dependsOn generateMetaFiles
 }
 
-//shadowJar {
-//    project.configurations.shadow.setTransitive(true);
-//    configurations = [project.configurations.shadow]
-//
-//    classifier '' // Replace the default JAR
-//}
-//
-//reobf {
-//    shadowJar {} // Reobfuscate the shadowed JAR
-//}
+shadowJar {
+    project.configurations.shadow.setTransitive(true);
+    configurations = [project.configurations.shadow]
+
+    classifier '' // Replace the default JAR
+
+    relocate "org.apache.commons.math3", "com.chaosbuffalo.bonetown.repack.org.apache.commons.math3"
+    relocate "org.lwjgl.assimp", "com.chaosbuffalo.bonetown.repack.org.lwjgl.assimp"
+}
+
+reobf {
+    shadowJar {} // Reobfuscate the shadowed JAR
+}
 
 
 // Example configuration to allow publishing using the maven-publish task

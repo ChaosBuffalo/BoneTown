@@ -10,6 +10,7 @@ import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
 import static org.lwjgl.assimp.Assimp.aiTextureType_DIFFUSE;
 import static org.lwjgl.assimp.Assimp.aiTextureType_NONE;
 
+import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class StaticMeshLoader {
     }
 
     public static AssimpMesh[] load(String resourcePath, String texturesDir, int flags) throws Exception {
-        AIScene aiScene = aiImportFile(resourcePath, flags);
+        AIScene aiScene = aiImportFile(texturesDir + File.separator + resourcePath, flags);
         if (aiScene == null) {
             throw new Exception("Error loading model [resourcePath: "  + resourcePath + ", texturesDir:" + texturesDir + "]");
         }
