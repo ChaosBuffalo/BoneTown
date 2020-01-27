@@ -1,7 +1,7 @@
-package com.chaosbuffalo.bonetown.client.render.assimp;
+package com.chaosbuffalo.bonetown.core.mesh_data;
 
 import net.minecraft.client.renderer.Vector4f;
-import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.util.ResourceLocation;
 
 
 public class AssimpMaterial {
@@ -16,14 +16,12 @@ public class AssimpMaterial {
 
     private float reflectance;
 
-    private Texture texture;
+    private ResourceLocation texture;
 
-    private Texture normalMap;
 
     public AssimpMaterial() {
         this.diffuseColour = DEFAULT_COLOUR;
         this.specularColour = DEFAULT_COLOUR;
-        this.texture = null;
         this.reflectance = 0;
     }
 
@@ -31,11 +29,11 @@ public class AssimpMaterial {
         this(colour, colour, null, reflectance);
     }
 
-    public AssimpMaterial(Texture texture) {
+    public AssimpMaterial(ResourceLocation texture) {
         this(DEFAULT_COLOUR, DEFAULT_COLOUR, texture, 0);
     }
 
-    public AssimpMaterial(Texture texture, float reflectance) {
+    public AssimpMaterial(ResourceLocation texture, float reflectance) {
         this(DEFAULT_COLOUR, DEFAULT_COLOUR, texture, reflectance);
     }
 
@@ -43,7 +41,7 @@ public class AssimpMaterial {
         this(diffuseColour, specularColour, null, reflectance);
     }
 
-    public AssimpMaterial(Vector4f diffuseColour, Vector4f specularColour, Texture texture, float reflectance) {
+    public AssimpMaterial(Vector4f diffuseColour, Vector4f specularColour, ResourceLocation texture, float reflectance) {
         this.diffuseColour = diffuseColour;
         this.specularColour = specularColour;
         this.texture = texture;
@@ -78,23 +76,11 @@ public class AssimpMaterial {
         return this.texture != null;
     }
 
-    public Texture getTexture() {
+    public ResourceLocation getTexture() {
         return texture;
     }
 
-    public void setTexture(Texture texture) {
+    public void setTexture(ResourceLocation texture) {
         this.texture = texture;
-    }
-
-    public boolean hasNormalMap() {
-        return this.normalMap != null;
-    }
-
-    public Texture getNormalMap() {
-        return normalMap;
-    }
-
-    public void setNormalMap(Texture normalMap) {
-        this.normalMap = normalMap;
     }
 }

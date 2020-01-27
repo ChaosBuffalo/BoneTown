@@ -1,4 +1,4 @@
-package com.chaosbuffalo.bonetown.client.render.assimp;
+package com.chaosbuffalo.bonetown.core.mesh_data;
 
 /**
  * Created by Jacob on 1/25/2020.

@@ -1,9 +1,11 @@
 package com.chaosbuffalo.bonetown;
 
-import com.chaosbuffalo.bonetown.client.render.assimp.AssimpMesh;
-import com.chaosbuffalo.bonetown.client.render.assimp.StaticMeshLoader;
+import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
+import com.chaosbuffalo.bonetown.core.mesh_data.AssimpConstants;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTMeshData;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,12 +17,12 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.stream.Collectors;
+
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("bonetown")
@@ -28,6 +30,7 @@ public class BoneTown
 {
     // Directly reference a log4j logger.
     public static final Logger LOGGER = LogManager.getLogger();
+    public static final String ModId = "bonetown";
 
     public BoneTown() {
         // Register the setup method for modloading
@@ -48,13 +51,8 @@ public class BoneTown
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
-        LOGGER.info(new Vector2D(1, 2).toString());
-        String path = "assets" + File.separator + "bonetown" + File.separator + "models";
-        try {
-            AssimpMesh[] meshes = StaticMeshLoader.load("untitlted.fbx", path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BoneTownRegistry.MESH_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
+
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

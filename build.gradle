@@ -113,7 +113,6 @@ dependencies {
     shadow (group: 'org.lwjgl', name: 'lwjgl-assimp', version: '3.2.2'){
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
-    shadow group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
 
 
@@ -195,7 +194,6 @@ shadowJar {
 
     classifier '' // Replace the default JAR
 
-    relocate "org.apache.commons.math3", "com.chaosbuffalo.bonetown.repack.org.apache.commons.math3"
     relocate "org.lwjgl.assimp", "com.chaosbuffalo.bonetown.repack.org.lwjgl.assimp"
 }
 

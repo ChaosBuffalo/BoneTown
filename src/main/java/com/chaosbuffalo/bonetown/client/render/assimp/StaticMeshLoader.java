@@ -1,24 +1,19 @@
 package com.chaosbuffalo.bonetown.client.render.assimp;
-import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_DIFFUSE;
-import static org.lwjgl.assimp.Assimp.AI_MATKEY_COLOR_SPECULAR;
-import static org.lwjgl.assimp.Assimp.aiGetMaterialColor;
-import static org.lwjgl.assimp.Assimp.aiImportFile;
-import static org.lwjgl.assimp.Assimp.aiProcess_FixInfacingNormals;
-import static org.lwjgl.assimp.Assimp.aiProcess_GenSmoothNormals;
-import static org.lwjgl.assimp.Assimp.aiProcess_JoinIdenticalVertices;
-import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
-import static org.lwjgl.assimp.Assimp.aiTextureType_DIFFUSE;
-import static org.lwjgl.assimp.Assimp.aiTextureType_NONE;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.Utils;
+import com.chaosbuffalo.bonetown.core.mesh_data.AssimpConstants;
+import com.chaosbuffalo.bonetown.core.mesh_data.AssimpMaterial;
+import com.chaosbuffalo.bonetown.core.mesh_data.AssimpMesh;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
@@ -29,27 +24,33 @@ import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import static org.lwjgl.assimp.Assimp.*;
+
 
 public class StaticMeshLoader {
 
-    public static AssimpMesh[] load(String resourcePath, String texturesDir) throws Exception {
-        return load(resourcePath, texturesDir,
-                aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_Triangulate
-                        | aiProcess_FixInfacingNormals);
+    public static AssimpMesh[] load(ByteBuffer resource, ResourceLocation name) throws Exception {
+        return load(resource, name,aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices |
+                aiProcess_Triangulate | aiProcess_FixInfacingNormals);
     }
 
-    public static AssimpMesh[] load(String resourcePath, String texturesDir, int flags) throws Exception {
-        AIScene aiScene = aiImportFile(texturesDir + File.separator + resourcePath, flags);
+    public static AssimpMesh[] load(ByteBuffer resource, ResourceLocation name, int flags) throws Exception {
+        byte[] stringBytes="fbx".getBytes("ISO-8859-1");
+        byte[] ntBytes=new byte[stringBytes.length+1];
+        System.arraycopy(stringBytes, 0, ntBytes, 0, stringBytes.length);
+        AIScene aiScene = aiImportFileFromMemory(resource, flags, ByteBuffer.wrap(ntBytes));
         if (aiScene == null) {
-            throw new Exception("Error loading model [resourcePath: "  + resourcePath + ", texturesDir:" + texturesDir + "]");
+            throw new Exception("Error loading model: " + aiGetErrorString());
         }
-
+        ResourceLocation textureLocation = new ResourceLocation(name.getNamespace(),
+                AssimpConstants.ASSIMP_TEXTURES_DIR +
+                        "/" + name.getPath() + ".png");
         int numMaterials = aiScene.mNumMaterials();
         PointerBuffer aiMaterials = aiScene.mMaterials();
         List<AssimpMaterial> materials = new ArrayList<>();
         for (int i = 0; i < numMaterials; i++) {
             AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(i));
-            processMaterial(aiMaterial, materials, texturesDir);
+            processMaterial(aiMaterial, materials, textureLocation);
         }
 
         int numMeshes = aiScene.mNumMeshes();
@@ -60,6 +61,7 @@ public class StaticMeshLoader {
             AssimpMesh mesh = processMesh(aiMesh, materials);
             meshes[i] = mesh;
         }
+        BoneTown.LOGGER.info("Loaded  << {} meshes", numMeshes);
 
         return meshes;
     }
@@ -77,7 +79,7 @@ public class StaticMeshLoader {
     }
 
     protected static void processMaterial(AIMaterial aiMaterial, List<AssimpMaterial> materials,
-                                          String texturesDir) throws Exception {
+                                          ResourceLocation baseTexture) throws Exception {
         AIColor4D colour = AIColor4D.create();
 
         AIString path = AIString.calloc();
@@ -105,7 +107,7 @@ public class StaticMeshLoader {
         }
 
         AssimpMaterial material = new AssimpMaterial(diffuse, specular, 1.0f);
-        material.setTexture(texture);
+        material.setTexture(baseTexture);
         materials.add(material);
     }
 
@@ -130,6 +132,10 @@ public class StaticMeshLoader {
             material = new AssimpMaterial();
         }
         mesh.setMaterial(material);
+        BoneTown.LOGGER.info("Loaded  << {} vertices", vertices.size());
+        BoneTown.LOGGER.info("Loaded  << {} indices", indices.size());
+        BoneTown.LOGGER.info("Loaded  << {} normals", normals.size());
+        BoneTown.LOGGER.info("Loaded  << {} textures", textures.size());
         return mesh;
     }
 
