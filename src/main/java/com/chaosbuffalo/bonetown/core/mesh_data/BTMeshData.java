@@ -9,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -17,12 +16,16 @@ import java.nio.ByteBuffer;
 public class BTMeshData implements IForgeRegistryEntry<BTMeshData> {
     private ResourceLocation location;
     private AssimpConstants.MeshTypes meshType;
-    private AssimpMesh[] meshes;
+    private BoneTownMesh[] meshes;
 
     public BTMeshData(ResourceLocation name, AssimpConstants.MeshTypes meshType){
         setRegistryName(name);
         this.meshType = meshType;
 
+    }
+
+    public BoneTownMesh[] getMeshes(){
+        return meshes;
     }
 
     public void load(){

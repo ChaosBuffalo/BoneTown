@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(BoneTown.ModId)
+@ObjectHolder(BoneTown.MODID)
 public class ModMeshData {
 
     @ObjectHolder("test_cube")
@@ -21,7 +21,7 @@ public class ModMeshData {
     public static void registerMeshData(RegistryEvent.Register<BTMeshData> event) {
         BoneTown.LOGGER.info("Registering Bone Town Mesh Data");
         event.getRegistry().register(new BTMeshData(
-                new ResourceLocation(BoneTown.ModId, "test_cube"),
+                new ResourceLocation(BoneTown.MODID, "test_cube"),
                 AssimpConstants.MeshTypes.FBX));
     }
 }

@@ -2,6 +2,7 @@ package com.chaosbuffalo.bonetown.platform;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 /**
@@ -27,6 +28,16 @@ public class GlStateManagerExtended extends GlStateManager {
     public static void deleteVertexArrays(int vaoId){
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         GL30.glDeleteVertexArrays(vaoId);
+    }
+
+    public static void disableVertexAttribArray(int array){
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        GL30.glDisableVertexAttribArray(array);
+    }
+
+    public static void drawElements(int mode, int count, int type, long indices){
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+        GL11.glDrawElements(mode, count, type, indices);
     }
 
 }
