@@ -6,21 +6,23 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ObjectHolder;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-@ObjectHolder(BoneTown.MODID)
 public class ModShaderData {
+
+    public static final ResourceLocation DEFAULT_SHADER_LOC = new ResourceLocation(BoneTown.MODID,
+            "default_shader");
+
 
     @SuppressWarnings("unused")
     @SubscribeEvent
-    public static void registerMeshData(RegistryEvent.Register<BTShaderProgramEntry> event) {
+    public static void registerShaders(RegistryEvent.Register<BTShaderProgramEntry> event) {
         BoneTown.LOGGER.info("Registering Bone Town Shader Data");
         event.getRegistry().register(
                 new BTShaderProgramEntry(
-                        new ResourceLocation(BoneTown.MODID, "test_prog"),
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/test_vert.vs"),
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/test_frag.fs")));
+                        DEFAULT_SHADER_LOC,
+                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_vert.vs"),
+                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_frag.fs")));
 
     }
 }

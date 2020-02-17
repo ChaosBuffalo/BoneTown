@@ -1,8 +1,7 @@
 package com.chaosbuffalo.bonetown.client.render.assimp;
 
-import com.chaosbuffalo.bonetown.core.mesh_data.BTMeshData;
-import com.chaosbuffalo.bonetown.core.mesh_data.BoneTownMaterial;
-import com.chaosbuffalo.bonetown.core.mesh_data.BoneTownMesh;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTMesh;
 import com.chaosbuffalo.bonetown.platform.GlStateManagerExtended;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -17,28 +16,27 @@ import java.util.List;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 
 
 public class BTEntityRenderData {
-    private BTMeshData model;
+    private BTModel model;
     public static final int MAX_WEIGHTS = 4;
     private EntityRendererManager manager;
     private boolean initialized;
 
     private final HashMap<String, BTMeshRenderData> meshData = new HashMap<>();
 
-    public BTEntityRenderData(BTMeshData modelIn, EntityRendererManager managerIn){
+    public BTEntityRenderData(BTModel modelIn, EntityRendererManager managerIn){
         model = modelIn;
         manager = managerIn;
         initialized = false;
     }
 
     public void GLinit(){
-        for (BoneTownMesh mesh : model.getMeshes()){
+        for (BTMesh mesh : model.getMeshes()){
             meshData.put(mesh.name, new BTMeshRenderData(mesh, manager));
         }
         initialized = true;
@@ -66,13 +64,13 @@ public class BTEntityRenderData {
     }
 
     private class BTMeshRenderData {
-        private final BoneTownMesh mesh;
+        private final BTMesh mesh;
         protected final int vaoId;
         protected final List<Integer> vboIdList;
         private final int vertexCount;
         private EntityRendererManager manager;
 
-        BTMeshRenderData(BoneTownMesh mesh, EntityRendererManager manager){
+        BTMeshRenderData(BTMesh mesh, EntityRendererManager manager){
 
             ByteBuffer posByteBuffer;
             ByteBuffer textCoordsByteBuffer;
@@ -99,9 +97,9 @@ public class BTEntityRenderData {
 
             vboId = GlStateManagerExtended.genBuffers();
             vboIdList.add(vboId);
-            textCoordsByteBuffer = GLAllocation.createDirectByteBuffer(mesh.textCoords.length * 4);
+            textCoordsByteBuffer = GLAllocation.createDirectByteBuffer(mesh.texCoords.length * 4);
             FloatBuffer textCoordsBuffer = textCoordsByteBuffer.asFloatBuffer();
-            textCoordsBuffer.put(mesh.textCoords).flip();
+            textCoordsBuffer.put(mesh.texCoords).flip();
             GlStateManagerExtended.bindBuffer(GL_ARRAY_BUFFER, vboId);
             GlStateManagerExtended.bufferData(GL_ARRAY_BUFFER, textCoordsByteBuffer, GL_STATIC_DRAW);
             GlStateManagerExtended.enableVertexAttribArray(1);
@@ -131,18 +129,12 @@ public class BTEntityRenderData {
         }
 
         protected void initRender() {
-            BoneTownMaterial material = mesh.getMaterial();
-            if (material.getTexture() != null) {
-                GlStateManagerExtended.activeTexture(GL_TEXTURE0);
-                this.manager.textureManager.bindTexture(material.getTexture());
-            }
             // Draw the mesh
             GlStateManagerExtended.bindVertexArray(vaoId);
         }
 
         protected void endRender(){
             GlStateManagerExtended.bindVertexArray(0);
-            GlStateManagerExtended.bindTexture(0);
         }
 
         public void render() {

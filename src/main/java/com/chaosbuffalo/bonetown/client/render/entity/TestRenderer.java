@@ -9,6 +9,9 @@ import net.minecraft.util.ResourceLocation;
 
 public class TestRenderer extends BTEntityRenderer<TestEntity> {
 
+    public static final ResourceLocation TEST_TEXTURE = new ResourceLocation(BoneTown.MODID,
+            "bone_town/textures/test_cube.png");
+
     public TestRenderer(final EntityRendererManager manager) {
         super(manager, ModMeshData.TEST_CUBE);
         BoneTown.LOGGER.info("Creating test renderer");
@@ -16,6 +19,6 @@ public class TestRenderer extends BTEntityRenderer<TestEntity> {
 
     @Override
     public ResourceLocation getEntityTexture(TestEntity entity) {
-        return null;
+        return TEST_TEXTURE;
     }
 }

@@ -1,7 +1,7 @@
 package com.chaosbuffalo.bonetown.core;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.mesh_data.BTMeshData;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderProgramEntry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -13,16 +13,16 @@ import net.minecraftforge.registries.RegistryBuilder;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class BoneTownRegistry {
 
-    public static IForgeRegistry<BTMeshData> MESH_REGISTRY  = null;
+    public static IForgeRegistry<BTModel> MESH_REGISTRY  = null;
     public static IForgeRegistry<BTShaderProgramEntry> SHADER_REGISTRY = null;
 
     @SuppressWarnings("unused")
     @SubscribeEvent
     public static void createRegistries(RegistryEvent.NewRegistry event) {
         BoneTown.LOGGER.info("Registering Bone Town Registries");
-        MESH_REGISTRY = new RegistryBuilder<BTMeshData>()
+        MESH_REGISTRY = new RegistryBuilder<BTModel>()
                 .setName(new ResourceLocation(BoneTown.MODID, "models"))
-                .setType(BTMeshData.class)
+                .setType(BTModel.class)
                 .setIDRange(0, Integer.MAX_VALUE - 1)
                 .allowModification()
                 .create();

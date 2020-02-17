@@ -26,11 +26,13 @@ public class BTShaderResourceManager implements ISelectiveResourceReloadListener
     private IResourceManager manager;
     private HashMap<ResourceLocation, BTShaderProgram> programCache = new HashMap<>();
 
+
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
         BoneTown.LOGGER.info("In resource manager reload for shader manager");
         if (resourcePredicate.test(getResourceType()))
         {
+            clearProgramCache();
             onResourceManagerReload(resourceManager);
         }
     }
@@ -40,27 +42,16 @@ public class BTShaderResourceManager implements ISelectiveResourceReloadListener
         programCache.clear();
     }
 
-    public OptionalInt getProgram(ResourceLocation location) {
+    public OptionalInt getProgramId(ResourceLocation location) {
         BTShaderProgram prog = programCache.get(location);
         return prog == null ? OptionalInt.empty() : OptionalInt.of(prog.getProgram());
     }
+
 
     public BTShaderProgram getShaderProgram(ResourceLocation location){
         return programCache.get(location);
     }
 
-    public void useProgram(ResourceLocation programLoc){
-        OptionalInt progInt = getProgram(programLoc);
-        if (!progInt.isPresent()){
-            BoneTown.LOGGER.error("Shader Program: {} not loaded, failed to activate.", programLoc.toString());
-            return;
-        }
-        ShaderLinkHelper.func_227804_a_(progInt.getAsInt());
-    }
-
-    public void releaseProgram(){
-        ShaderLinkHelper.func_227804_a_(0);
-    }
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {

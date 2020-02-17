@@ -7,33 +7,25 @@ import java.util.List;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.Utils;
-import com.chaosbuffalo.bonetown.core.mesh_data.AssimpConstants;
-import com.chaosbuffalo.bonetown.core.mesh_data.BoneTownMaterial;
-import com.chaosbuffalo.bonetown.core.mesh_data.BoneTownMesh;
-import net.minecraft.client.renderer.Vector4f;
-import net.minecraft.client.renderer.texture.Texture;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTMesh;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
-import org.lwjgl.assimp.Assimp;
 
 import static org.lwjgl.assimp.Assimp.*;
 
 
 public class StaticMeshLoader {
 
-    public static BoneTownMesh[] load(ByteBuffer resource, ResourceLocation name) throws Exception {
+    public static BTMesh[] load(ByteBuffer resource, ResourceLocation name) throws Exception {
         return load(resource, name,aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices |
                 aiProcess_Triangulate | aiProcess_FixInfacingNormals);
     }
 
-    public static BoneTownMesh[] load(ByteBuffer resource, ResourceLocation name, int flags) throws Exception {
+    public static BTMesh[] load(ByteBuffer resource, ResourceLocation name, int flags) throws Exception {
         byte[] stringBytes="fbx".getBytes("ISO-8859-1");
         byte[] ntBytes=new byte[stringBytes.length+1];
         System.arraycopy(stringBytes, 0, ntBytes, 0, stringBytes.length);
@@ -41,23 +33,13 @@ public class StaticMeshLoader {
         if (aiScene == null) {
             throw new Exception("Error loading model: " + aiGetErrorString());
         }
-        ResourceLocation textureLocation = new ResourceLocation(name.getNamespace(),
-                AssimpConstants.ASSIMP_TEXTURES_DIR +
-                        "/" + name.getPath() + ".png");
-        int numMaterials = aiScene.mNumMaterials();
-        PointerBuffer aiMaterials = aiScene.mMaterials();
-        List<BoneTownMaterial> materials = new ArrayList<>();
-        for (int i = 0; i < numMaterials; i++) {
-            AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(i));
-            processMaterial(aiMaterial, materials, textureLocation);
-        }
 
         int numMeshes = aiScene.mNumMeshes();
         PointerBuffer aiMeshes = aiScene.mMeshes();
-        BoneTownMesh[] meshes = new BoneTownMesh[numMeshes];
+        BTMesh[] meshes = new BTMesh[numMeshes];
         for (int i = 0; i < numMeshes; i++) {
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
-            BoneTownMesh mesh = processMesh(aiMesh, materials);
+            BTMesh mesh = processMesh(aiMesh);
             meshes[i] = mesh;
         }
         BoneTown.LOGGER.info("Loaded  << {} meshes", numMeshes);
@@ -77,40 +59,8 @@ public class StaticMeshLoader {
         }
     }
 
-    protected static void processMaterial(AIMaterial aiMaterial, List<BoneTownMaterial> materials,
-                                          ResourceLocation baseTexture) throws Exception {
-        AIColor4D colour = AIColor4D.create();
 
-        AIString path = AIString.calloc();
-        Assimp.aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null,
-                null, null, null, null, null);
-        String textPath = path.dataString();
-        Texture texture = null;
-
-        if (textPath != null && textPath.length() > 0) {
-            BoneTown.LOGGER.info(String.format("File for texture is: %s", textPath));
-        }
-
-        Vector4f diffuse = BoneTownMaterial.DEFAULT_COLOUR;
-        int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0,
-                colour);
-        if (result == 0) {
-            diffuse = new Vector4f(colour.r(), colour.g(), colour.b(), colour.a());
-        }
-
-        Vector4f specular = BoneTownMaterial.DEFAULT_COLOUR;
-        result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, aiTextureType_NONE, 0,
-                colour);
-        if (result == 0) {
-            specular = new Vector4f(colour.r(), colour.g(), colour.b(), colour.a());
-        }
-
-        BoneTownMaterial material = new BoneTownMaterial(diffuse, specular, 1.0f);
-        material.setTexture(baseTexture);
-        materials.add(material);
-    }
-
-    private static BoneTownMesh processMesh(AIMesh aiMesh, List<BoneTownMaterial> materials) {
+    private static BTMesh processMesh(AIMesh aiMesh) {
         BoneTown.LOGGER.info("Loading Mesh << {}", aiMesh.mName().toString());
         List<Float> vertices = new ArrayList<>();
         List<Float> textures = new ArrayList<>();
@@ -123,16 +73,8 @@ public class StaticMeshLoader {
         processIndices(aiMesh, indices);
 
 
-        BoneTownMesh mesh = new BoneTownMesh(Utils.listToArray(vertices), Utils.listToArray(textures),
+        BTMesh mesh = new BTMesh(Utils.listToArray(vertices), Utils.listToArray(textures),
                 Utils.listToArray(normals), Utils.listIntToArray(indices), aiMesh.mName().toString());
-        BoneTownMaterial material;
-        int materialIdx = aiMesh.mMaterialIndex();
-        if (materialIdx >= 0 && materialIdx < materials.size()) {
-            material = materials.get(materialIdx);
-        } else {
-            material = new BoneTownMaterial();
-        }
-        mesh.setMaterial(material);
         BoneTown.LOGGER.info("Loaded  << {} vertices", vertices.size());
         BoneTown.LOGGER.info("Loaded  << {} indices", indices.size());
         BoneTown.LOGGER.info("Loaded  << {} normals", normals.size());
@@ -157,6 +99,7 @@ public class StaticMeshLoader {
             AIVector3D textCoord = textCoords.get();
             textures.add(textCoord.x());
             textures.add(1 - textCoord.y());
+            BoneTown.LOGGER.info("vert: {}, tex coord: {}, {}", i, textCoord.x(), 1 - textCoord.y());
         }
     }
 

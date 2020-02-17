@@ -2,7 +2,7 @@ package com.chaosbuffalo.bonetown.init;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.mesh_data.AssimpConstants;
-import com.chaosbuffalo.bonetown.core.mesh_data.BTMeshData;
+import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,13 +14,13 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModMeshData {
 
     @ObjectHolder("test_cube")
-    public static BTMeshData TEST_CUBE;
+    public static BTModel TEST_CUBE;
 
     @SuppressWarnings("unused")
     @SubscribeEvent
-    public static void registerMeshData(RegistryEvent.Register<BTMeshData> event) {
+    public static void registerMeshData(RegistryEvent.Register<BTModel> event) {
         BoneTown.LOGGER.info("Registering Bone Town Mesh Data");
-        event.getRegistry().register(new BTMeshData(
+        event.getRegistry().register(new BTModel(
                 new ResourceLocation(BoneTown.MODID, "test_cube"),
                 AssimpConstants.MeshTypes.FBX));
     }
