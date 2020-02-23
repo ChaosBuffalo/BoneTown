@@ -1,40 +1,39 @@
 package com.chaosbuffalo.bonetown.core.mesh_data;
 
+import com.chaosbuffalo.bonetown.core.animation_data.BTSkeleton;
 import com.chaosbuffalo.bonetown.core.assimp.AssimpMeshLoader;
-import com.chaosbuffalo.bonetown.init.ModShaderData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.system.MemoryUtil;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-public class BTModel implements IForgeRegistryEntry<BTModel> {
-    private ResourceLocation location;
-    private ResourceLocation programName;
-    public final AssimpConstants.MeshTypes meshType;
-    private BTMesh[] meshes;
+public class BTAnimatedModel extends BTModel {
 
-    public BTModel(ResourceLocation name, AssimpConstants.MeshTypes meshType){
-        this(name, ModShaderData.DEFAULT_SHADER_LOC, meshType);
+    private BTAnimatedMesh[] animatedMeshes;
+    private BTSkeleton skeleton;
+
+    public BTAnimatedModel(ResourceLocation name, ResourceLocation programName,
+                           AssimpConstants.MeshTypes meshType) {
+        super(name, programName, meshType);
     }
 
-    public BTModel(ResourceLocation name, ResourceLocation programName,
-                   AssimpConstants.MeshTypes meshType){
-        setRegistryName(name);
-        this.meshType = meshType;
-        this.programName = programName;
-    }
-
+    @Override
     public BTMesh[] getMeshes(){
-        return meshes;
+        return animatedMeshes;
     }
 
-    public void load(){
+    public BTSkeleton getSkeleton(){
+        return skeleton;
+    }
+
+    public BTAnimatedMesh[] getAnimatedMeshes() { return animatedMeshes; }
+
+    @Override
+    public void load() {
         String meshExt = AssimpConstants.stringFromMeshType(meshType);
         ResourceLocation name = getRegistryName();
         ResourceLocation meshLocation = new ResourceLocation(name.getNamespace(),
@@ -51,7 +50,9 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
             data.flip();
             stream.close();
             try {
-                this.meshes = AssimpMeshLoader.load(data, name);
+                AssimpMeshLoader.LoadAnimatedReturn ret = AssimpMeshLoader.loadAnimated(data, name);
+                this.animatedMeshes = ret.meshes;
+                this.skeleton = ret.skeleton;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -60,23 +61,4 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public BTModel setRegistryName(ResourceLocation name) {
-        location = name;
-        return this;
-    }
-
-    @Nullable
-    @Override
-    public ResourceLocation getRegistryName() {
-        return location;
-    }
-
-    @Override
-    public Class<BTModel> getRegistryType() {
-        return BTModel.class;
-    }
-
-    public ResourceLocation getProgramName(){ return programName; }
 }

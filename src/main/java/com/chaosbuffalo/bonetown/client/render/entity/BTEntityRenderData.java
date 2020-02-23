@@ -1,4 +1,4 @@
-package com.chaosbuffalo.bonetown.client.render.assimp;
+package com.chaosbuffalo.bonetown.client.render.entity;
 
 import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
 import com.chaosbuffalo.bonetown.core.mesh_data.BTMesh;

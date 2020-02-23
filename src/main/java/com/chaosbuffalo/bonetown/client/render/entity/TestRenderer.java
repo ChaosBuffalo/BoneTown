@@ -1,7 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.client.render.assimp.BTEntityRenderer;
 import com.chaosbuffalo.bonetown.entities.TestEntity;
 import com.chaosbuffalo.bonetown.init.ModMeshData;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

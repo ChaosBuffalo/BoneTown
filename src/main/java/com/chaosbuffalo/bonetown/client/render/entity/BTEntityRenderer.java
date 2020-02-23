@@ -1,8 +1,6 @@
-package com.chaosbuffalo.bonetown.client.render.assimp;
+package com.chaosbuffalo.bonetown.client.render.entity;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.Utils;
-import com.chaosbuffalo.bonetown.client.render.GlobalRenderInfo;
 import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderProgram;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;

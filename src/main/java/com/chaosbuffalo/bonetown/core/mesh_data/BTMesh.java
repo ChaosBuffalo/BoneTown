@@ -11,7 +11,7 @@ public class BTMesh {
     public final int[] indices;
     public String name;
 
-    public BTMesh(float[] positions, float[] texCoords, float[] normals, int[] indices, String name){
+    public BTMesh(String name, float[] positions, float[] texCoords, float[] normals, int[] indices){
         this.positions = positions;
         this.texCoords = texCoords;
         this.normals = normals;
