@@ -1,15 +1,21 @@
 package com.chaosbuffalo.bonetown.core.mesh_data;
 
+import com.chaosbuffalo.bonetown.client.render.entity.BTAnimatedMeshRenderData;
+import com.chaosbuffalo.bonetown.client.render.entity.IBTRenderData;
 import com.chaosbuffalo.bonetown.core.animation_data.BTSkeleton;
 import com.chaosbuffalo.bonetown.core.assimp.AssimpMeshLoader;
+import com.chaosbuffalo.bonetown.init.ModShaderData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+
 
 public class BTAnimatedModel extends BTModel {
 
@@ -19,6 +25,10 @@ public class BTAnimatedModel extends BTModel {
     public BTAnimatedModel(ResourceLocation name, ResourceLocation programName,
                            AssimpConstants.MeshTypes meshType) {
         super(name, programName, meshType);
+    }
+
+    public BTAnimatedModel(ResourceLocation name, AssimpConstants.MeshTypes meshType){
+        this(name, ModShaderData.DEFAULT_ANIMATED_LOC, meshType);
     }
 
     @Override
@@ -31,6 +41,7 @@ public class BTAnimatedModel extends BTModel {
     }
 
     public BTAnimatedMesh[] getAnimatedMeshes() { return animatedMeshes; }
+
 
     @Override
     public void load() {

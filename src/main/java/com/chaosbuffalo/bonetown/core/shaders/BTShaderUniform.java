@@ -35,7 +35,8 @@ public class BTShaderUniform implements AutoCloseable {
         vec3f,
         vec3i,
         vec4i,
-        vec4f
+        vec4f,
+        vecmat4x4
     }
     public static int getCountForType(UniformType type){
         switch (type){
@@ -63,6 +64,7 @@ public class BTShaderUniform implements AutoCloseable {
             case mat3x3:
                 return 9;
             case mat4x4:
+            case vecmat4x4:
                 return 16;
             default:
                 return 1;
@@ -114,6 +116,8 @@ public class BTShaderUniform implements AutoCloseable {
         int loc = ShaderUniform.func_227806_a_(programId, this.getUniformName());
         if (loc == -1){
             BoneTown.LOGGER.warn("Error trying to bind loc for {}", this.getUniformName());
+        } else {
+            BoneTown.LOGGER.info("Loc for {}, {}: {}", programId, this.getUniformName(), loc);
         }
         setUniformLocation(loc);
     }
@@ -230,6 +234,24 @@ public class BTShaderUniform implements AutoCloseable {
         }
     }
 
+    public void set(org.joml.Matrix4f... mats){
+        if (uniformType == UniformType.vecmat4x4){
+            int count = 0;
+            this.uniformFloatBuffer.position(0);
+            for (org.joml.Matrix4f mat : mats){
+                int offset = 16 * count;
+                mat.get(offset, this.uniformFloatBuffer);
+                count++;
+            }
+            this.markDirty();
+        }
+        else {
+            BoneTown.LOGGER.warn(
+                    "Trying to upload mat4x4 vector to non vecmat4x4 type uniform {}",
+                    this.getUniformName());
+        }
+    }
+
 
     private void uploadFloat() {
         this.uniformFloatBuffer.clear();
@@ -261,6 +283,7 @@ public class BTShaderUniform implements AutoCloseable {
             case mat3x3:
                 RenderSystem.glUniformMatrix3(this.uniformLocation, false, this.uniformFloatBuffer);
                 break;
+            case vecmat4x4:
             case mat4x4:
                 RenderSystem.glUniformMatrix4(this.uniformLocation, false, this.uniformFloatBuffer);
                 break;

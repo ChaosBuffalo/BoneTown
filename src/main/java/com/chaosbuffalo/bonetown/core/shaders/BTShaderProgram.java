@@ -6,7 +6,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Vector4f;
-import net.minecraft.client.shader.IShaderManager;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.client.shader.ShaderLoader;
 
@@ -14,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BTShaderProgram implements IShaderManager {
-    private final int program;
-    private final ShaderLoader vert;
-    private final ShaderLoader frag;
-    private boolean firstUpload;
-    private final static int DIFFUSE_COUNT = 2;
+public class BTShaderProgram implements IBTShaderProgram {
+    protected final int program;
+    protected final ShaderLoader vert;
+    protected final ShaderLoader frag;
+    protected boolean firstUpload;
+    protected final static int DIFFUSE_COUNT = 2;
     public BTShaderUniform projUniform;
     public BTShaderUniform modelViewUniform;
     public BTShaderUniform lightMapUV;
@@ -27,7 +26,7 @@ public class BTShaderProgram implements IShaderManager {
     public BTShaderUniform ambientLight;
     public BTShaderUniform diffuseColors;
     public BTShaderUniform diffuseLocs;
-    private final List<BTShaderUniform> uniforms = new ArrayList<>();
+    protected final List<BTShaderUniform> uniforms = new ArrayList<>();
 
     public BTShaderProgram(int program, ShaderLoader vert, ShaderLoader frag) {
         this.program = program;
@@ -58,6 +57,7 @@ public class BTShaderProgram implements IShaderManager {
 
     }
 
+    @Override
     public void initRender(RenderType renderType, MatrixStack matrixStackIn, Matrix4f projection,
                            int packedLight, int packedOverlay){
 
@@ -82,6 +82,7 @@ public class BTShaderProgram implements IShaderManager {
         diffuseColors.upload();
     }
 
+    @Override
     public void endRender(RenderType renderType){
         renderType.disable();
         this.releaseProgram();
@@ -97,6 +98,7 @@ public class BTShaderProgram implements IShaderManager {
 
     }
 
+    @Override
     public void setupUniforms(){
         for (BTShaderUniform uniform : uniforms){
             uniform.bindUniform(program);
@@ -123,7 +125,7 @@ public class BTShaderProgram implements IShaderManager {
     }
 
     public void uploadPackedLightMap(int packedLightmap){
-        BoneTown.LOGGER.info("lightmap coords: {}, {}", (packedLightmap & 0xFFFF) /256.0f,(packedLightmap >>> 16) / 256.0f );
+//        BoneTown.LOGGER.info("lightmap coords: {}, {}", (packedLightmap & 0xFFFF) /256.0f,(packedLightmap >>> 16) / 256.0f );
         lightMapUV.set(((packedLightmap & 0xFFFF) / 256.0f) + 0.03125f, ((packedLightmap >>> 16) / 256.0f) + 0.03125f);
 //        lightMapUV.set(0.0f, 0.0f);
         lightMapUV.upload();

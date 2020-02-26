@@ -101,8 +101,8 @@ public class AssimpMeshLoader {
 
 
             List<AnimationFrame> frames = buildAnimationFrames(boneList, rootNode, rootTransformation);
-            BTAnimation animation = new BTAnimation(
-                    aiAnimation.mName().dataString(), frames, aiAnimation.mDuration());
+            String name = aiAnimation.mName().dataString().split("\\|")[1];
+            BTAnimation animation = new BTAnimation(name, frames, aiAnimation.mDuration());
             BoneTown.LOGGER.info("Loading Animation: {} with {} frames", animation.getName(),
                     animation.getFrameCount());
             animations.put(animation.getName(), animation);

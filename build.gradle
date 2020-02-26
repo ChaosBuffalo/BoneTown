@@ -114,7 +114,7 @@ dependencies {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
     // https://mvnrepository.com/artifact/org.joml/joml
-    compile group: 'org.joml', name: 'joml', version: '1.9.2'
+    shadow group: 'org.joml', name: 'joml', version: '1.9.2'
 
 
 

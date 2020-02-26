@@ -8,6 +8,8 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.system.MemoryUtil;
 
+
+
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +22,9 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
     private BTMesh[] meshes;
 
     public BTModel(ResourceLocation name, AssimpConstants.MeshTypes meshType){
-        this(name, ModShaderData.DEFAULT_SHADER_LOC, meshType);
+        this(name, ModShaderData.DEFAULT_STATIC_LOC, meshType);
     }
+
 
     public BTModel(ResourceLocation name, ResourceLocation programName,
                    AssimpConstants.MeshTypes meshType){

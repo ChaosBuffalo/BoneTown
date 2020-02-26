@@ -24,7 +24,7 @@ public class BTShaderResourceManager implements ISelectiveResourceReloadListener
     public static final BTShaderResourceManager INSTANCE = new BTShaderResourceManager();
 
     private IResourceManager manager;
-    private HashMap<ResourceLocation, BTShaderProgram> programCache = new HashMap<>();
+    private HashMap<ResourceLocation, IBTShaderProgram> programCache = new HashMap<>();
 
 
     @Override
@@ -43,12 +43,12 @@ public class BTShaderResourceManager implements ISelectiveResourceReloadListener
     }
 
     public OptionalInt getProgramId(ResourceLocation location) {
-        BTShaderProgram prog = programCache.get(location);
+        IBTShaderProgram prog = programCache.get(location);
         return prog == null ? OptionalInt.empty() : OptionalInt.of(prog.getProgram());
     }
 
 
-    public BTShaderProgram getShaderProgram(ResourceLocation location){
+    public IBTShaderProgram getShaderProgram(ResourceLocation location){
         return programCache.get(location);
     }
 
@@ -67,7 +67,7 @@ public class BTShaderResourceManager implements ISelectiveResourceReloadListener
             ShaderLoader vert = createShader(manager, program.getVertexShader(), ShaderLoader.ShaderType.VERTEX);
             ShaderLoader frag = createShader(manager, program.getFragShader(), ShaderLoader.ShaderType.FRAGMENT);
             int progId = ShaderLinkHelper.createProgram();
-            BTShaderProgram prog = new BTShaderProgram(progId, vert, frag);
+            IBTShaderProgram prog = program.getProgram(progId, vert, frag);
             ShaderLinkHelper.linkProgram(prog);
             prog.setupUniforms();
             programCache.put(program.getRegistryName(), prog);

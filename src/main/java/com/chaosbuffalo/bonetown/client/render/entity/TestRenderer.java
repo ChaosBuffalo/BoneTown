@@ -1,15 +1,18 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.entities.TestEntity;
+import com.chaosbuffalo.bonetown.entity.TestEntity;
 import com.chaosbuffalo.bonetown.init.ModMeshData;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public class TestRenderer extends BTEntityRenderer<TestEntity> {
 
     public static final ResourceLocation TEST_TEXTURE = new ResourceLocation(BoneTown.MODID,
-            "bone_town/textures/test_cube.png");
+            "bone_town/textures/spider.png");
 
     public TestRenderer(final EntityRendererManager manager) {
         super(manager, ModMeshData.TEST_CUBE);

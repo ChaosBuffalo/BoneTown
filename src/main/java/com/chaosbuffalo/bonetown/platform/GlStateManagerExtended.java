@@ -5,6 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
+import java.nio.FloatBuffer;
+
 /**
  * Created by Jacob on 1/25/2020.
  */
@@ -38,6 +40,10 @@ public class GlStateManagerExtended extends GlStateManager {
     public static void drawElements(int mode, int count, int type, long indices){
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         GL11.glDrawElements(mode, count, type, indices);
+    }
+
+    public static void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer buffer){
+        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
     }
 
 }

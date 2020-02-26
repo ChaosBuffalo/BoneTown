@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown;
 
+import com.chaosbuffalo.bonetown.client.render.entity.TestAnimatedRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
 import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
@@ -60,12 +61,18 @@ public class BoneTown
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
         BoneTownRegistry.MESH_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
 
+
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
-        RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.TEST_ENTITY.get(), TestRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                ModEntityTypes.TEST_ENTITY.get(),
+                TestRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                ModEntityTypes.TEST_ANIMATED_ENTITY.get(),
+                TestAnimatedRenderer::new);
         LOGGER.debug("Registered Entity Renderers");
 
     }

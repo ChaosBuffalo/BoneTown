@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.core.shaders;
 
+import net.minecraft.client.shader.ShaderLoader;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -29,6 +30,10 @@ public class BTShaderProgramEntry implements IForgeRegistryEntry<BTShaderProgram
     public BTShaderProgramEntry setRegistryName(ResourceLocation name) {
         location = name;
         return this;
+    }
+
+    public IBTShaderProgram getProgram(int programId, ShaderLoader vertex, ShaderLoader frag){
+        return new BTShaderProgram(programId, vertex, frag);
     }
 
     @Nullable

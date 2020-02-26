@@ -1,9 +1,9 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
-import com.chaosbuffalo.bonetown.BoneTown;
+
 import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
-import com.chaosbuffalo.bonetown.core.shaders.BTShaderProgram;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;
+import com.chaosbuffalo.bonetown.core.shaders.IBTShaderProgram;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -15,8 +15,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.LightType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -27,7 +25,7 @@ import java.util.HashMap;
 public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<T> {
 
     private BTModel model;
-    BTEntityRenderData entityRenderData;
+    BTModelRenderData modelRenderData;
     HashMap<T, Boolean> activeEntities;
 
 
@@ -35,7 +33,7 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         super(renderManager);
         this.model = model;
         this.activeEntities = new HashMap<>();
-        this.entityRenderData = new BTEntityRenderData(model, renderManager);
+        this.modelRenderData = new BTModelRenderData(model, renderManager);
 
     }
 
@@ -68,6 +66,14 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         activeEntities.remove(entityIn);
     }
 
+    public void drawModel(RenderType renderType, T entityIn, float entityYaw, float partialTicks,
+                          MatrixStack matrixStackIn, Matrix4f projectionMatrix, int packedLightIn,
+                          int packedOverlay, IBTShaderProgram program){
+
+        program.initRender(renderType, matrixStackIn, projectionMatrix, packedLightIn, packedOverlay);
+        modelRenderData.render();
+        program.endRender(renderType);
+    }
 
     @Override
     public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn,
@@ -77,28 +83,24 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         boolean visibleToPlayer = !visible && !entityIn.isInvisibleToPlayer(Minecraft.getInstance().player);
         RenderType rendertype = this.getRenderType(entityIn, visible, visibleToPlayer);
         bufferIn.getBuffer(rendertype);
-        if (!entityRenderData.isInitialized()){
-//            BoneTown.LOGGER.info("In init call");
-            entityRenderData.GLinit();
+        if (!modelRenderData.isInitialized()){
+            modelRenderData.GLinit();
         }
-
-        BoneTown.LOGGER.info("Block light {}", this.getBlockLight(entityIn, partialTicks));
-        BoneTown.LOGGER.info("Sky light {}",
-                entityIn.world.getLightFor(LightType.SKY, new BlockPos(entityIn.getEyePosition(partialTicks))));
         GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
         Matrix4f projMatrix = gameRenderer.getProjectionMatrix(gameRenderer.getActiveRenderInfo(), partialTicks,
                 true);
-        BTShaderProgram program = BTShaderResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
+        IBTShaderProgram program = BTShaderResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
         int packedOverlay;
         if (entityIn instanceof LivingEntity){
             packedOverlay = LivingRenderer.getPackedOverlay((LivingEntity) entityIn, partialTicks);
         } else {
             packedOverlay = OverlayTexture.DEFAULT_LIGHT;
         }
-        program.initRender(rendertype, matrixStackIn, projMatrix, packedLightIn, packedOverlay);
-//        Utils.readLightTextureData();
-        entityRenderData.render();
-        program.endRender(rendertype);
+        drawModel(rendertype, entityIn,
+                entityYaw, partialTicks, matrixStackIn,
+                projMatrix, packedLightIn,
+                packedOverlay, program);
+
 
     }
 
