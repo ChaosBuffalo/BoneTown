@@ -1,6 +1,6 @@
 package com.chaosbuffalo.bonetown.core.shaders;
 
-import com.chaosbuffalo.bonetown.core.animation_data.AnimationFrame;
+import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import net.minecraft.client.shader.ShaderLoader;
 import org.joml.Matrix4f;
 

@@ -1,7 +1,8 @@
 package com.chaosbuffalo.bonetown.core;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
+import com.chaosbuffalo.bonetown.core.animation.BTAdditionalAnimationEntry;
+import com.chaosbuffalo.bonetown.core.model.BTModel;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderProgramEntry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -13,14 +14,15 @@ import net.minecraftforge.registries.RegistryBuilder;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class BoneTownRegistry {
 
-    public static IForgeRegistry<BTModel> MESH_REGISTRY  = null;
+    public static IForgeRegistry<BTModel> MODEL_REGISTRY = null;
     public static IForgeRegistry<BTShaderProgramEntry> SHADER_REGISTRY = null;
+    public static IForgeRegistry<BTAdditionalAnimationEntry> ADDITIONAL_ANIMATION_REGISTRY = null;
 
     @SuppressWarnings("unused")
     @SubscribeEvent
     public static void createRegistries(RegistryEvent.NewRegistry event) {
         BoneTown.LOGGER.info("Registering Bone Town Registries");
-        MESH_REGISTRY = new RegistryBuilder<BTModel>()
+        MODEL_REGISTRY = new RegistryBuilder<BTModel>()
                 .setName(new ResourceLocation(BoneTown.MODID, "models"))
                 .setType(BTModel.class)
                 .setIDRange(0, Integer.MAX_VALUE - 1)
@@ -29,6 +31,12 @@ public class BoneTownRegistry {
         SHADER_REGISTRY = new RegistryBuilder<BTShaderProgramEntry>()
                 .setName(new ResourceLocation(BoneTown.MODID, "shaders"))
                 .setType(BTShaderProgramEntry.class)
+                .setIDRange(0, Integer.MAX_VALUE - 1)
+                .allowModification()
+                .create();
+        ADDITIONAL_ANIMATION_REGISTRY = new RegistryBuilder<BTAdditionalAnimationEntry>()
+                .setName(new ResourceLocation(BoneTown.MODID, "z_add_animations"))
+                .setType(BTAdditionalAnimationEntry.class)
                 .setIDRange(0, Integer.MAX_VALUE - 1)
                 .allowModification()
                 .create();

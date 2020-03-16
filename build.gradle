@@ -114,7 +114,8 @@ dependencies {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
     // https://mvnrepository.com/artifact/org.joml/joml
-    shadow group: 'org.joml', name: 'joml', version: '1.9.2'
+    shadow group: 'org.joml', name: 'joml', version: '1.9.22'
+    shadow group: 'com.upokecenter', name: 'cbor', version: '4.1.0'
 
 
 
@@ -197,6 +198,9 @@ shadowJar {
     classifier '' // Replace the default JAR
 
     relocate "org.lwjgl.assimp", "com.chaosbuffalo.bonetown.repack.org.lwjgl.assimp"
+    relocate "org.joml", "com.chaosbuffalo.bonetown.repack.org.joml"
+    relocate "com.upokecenter", "com.chaosbuffalo.bonetown.repack.com.upokecenter"
+
 }
 
 reobf {

@@ -1,7 +1,7 @@
 package com.chaosbuffalo.bonetown.core.shaders;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.platform.GlStateManagerExtended;
+import com.chaosbuffalo.bonetown.client.render.platform.GlStateManagerExtended;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.shader.IShaderManager;

@@ -26,13 +26,13 @@ public class ModShaderData {
         event.getRegistry().register(
                 new BTShaderProgramEntry(
                         DEFAULT_STATIC_LOC,
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_static.vs"),
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_static.fs")));
+                        new ResourceLocation(BoneTown.MODID, "bonetown/shaders/default_static.vs"),
+                        new ResourceLocation(BoneTown.MODID, "bonetown/shaders/default_static.fs")));
         event.getRegistry().register(
                 new AnimatedShaderProgramEntry(
                     DEFAULT_ANIMATED_LOC,
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_animated.vs"),
-                        new ResourceLocation(BoneTown.MODID, "bone_town/shaders/default_animated.fs")));
+                        new ResourceLocation(BoneTown.MODID, "bonetown/shaders/default_animated.vs"),
+                        new ResourceLocation(BoneTown.MODID, "bonetown/shaders/default_animated.fs")));
 
     }
 }

@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown;
 
+import com.chaosbuffalo.bonetown.client.render.entity.DebugBoneRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestAnimatedRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
@@ -8,7 +9,6 @@ import com.chaosbuffalo.bonetown.core.proxy.IBTProxy;
 import com.chaosbuffalo.bonetown.core.proxy.ServerProxy;
 import com.chaosbuffalo.bonetown.init.ModEntityTypes;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.stream.Collectors;
+
 
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -56,12 +57,9 @@ public class BoneTown
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
-        BoneTownRegistry.MESH_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
 
-
+        BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
+        BoneTownRegistry.ADDITIONAL_ANIMATION_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
@@ -73,6 +71,9 @@ public class BoneTown
         RenderingRegistry.registerEntityRenderingHandler(
                 ModEntityTypes.TEST_ANIMATED_ENTITY.get(),
                 TestAnimatedRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                ModEntityTypes.DEBUG_BONE_ENTITY.get(),
+                DebugBoneRenderer::new);
         LOGGER.debug("Registered Entity Renderers");
 
     }

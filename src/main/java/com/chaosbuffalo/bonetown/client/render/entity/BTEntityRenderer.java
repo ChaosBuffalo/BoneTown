@@ -1,7 +1,8 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
 
-import com.chaosbuffalo.bonetown.core.mesh_data.BTModel;
+import com.chaosbuffalo.bonetown.client.render.render_data.BTModelRenderData;
+import com.chaosbuffalo.bonetown.core.model.BTModel;
 import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;
 import com.chaosbuffalo.bonetown.core.shaders.IBTShaderProgram;
 import com.mojang.blaze3d.matrix.MatrixStack;

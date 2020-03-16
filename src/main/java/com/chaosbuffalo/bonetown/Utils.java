@@ -38,13 +38,6 @@ public class Utils {
                 for (int x = 0; x < image.getWidth(); x++){
                     for (int y = 0; y < image.getHeight(); y++){
                         int color = image.getPixelRGBA(x, y);
-////                        int l = getAlpha(k);
-////                        int i1 = getBlue(k);
-////                        int j1 = getGreen(k);
-////                        int k1 = getRed(k);
-////                        int alpha = color >> 24;
-////                        int blue = color;
-//                        int l1 = l << 24 | k1 << 16 | j1 << 8 | i1;
                         int alpha = color >>> 24;
                         int red = color >>> 16 & 0xFF;
                         int green = color >>> 8 & 0xFF;
