@@ -1,56 +1,42 @@
 package com.chaosbuffalo.bonetown.core.animation;
 
 
-import org.joml.Matrix4f;
+import org.joml.Matrix4d;
 
 import java.util.Arrays;
 
-public class AnimationFrame implements IAnimationProvider {
-
-    private static final Matrix4f IDENTITY_MATRIX = new Matrix4f();
-
-    private final Matrix4f[] localJointMatrices;
+public class AnimationFrame implements IPose {
 
     public static final int MAX_JOINTS = 150;
 
-    public static final Matrix4f[] DEFAULT_FRAME = new Matrix4f[MAX_JOINTS];
+    public static final Matrix4d[] DEFAULT_FRAME = new Matrix4d[MAX_JOINTS];
 
     static {
-        Arrays.fill(DEFAULT_FRAME, IDENTITY_MATRIX);
+        Arrays.fill(DEFAULT_FRAME, new Matrix4d());
     }
 
-    private final Matrix4f[] jointMatrices;
+    private final Matrix4d[] jointMatrices;
 
     public AnimationFrame() {
-        jointMatrices = new Matrix4f[MAX_JOINTS];
-        Arrays.fill(jointMatrices, IDENTITY_MATRIX);
-        localJointMatrices = new Matrix4f[MAX_JOINTS];
-        Arrays.fill(localJointMatrices, IDENTITY_MATRIX);
+        jointMatrices = new Matrix4d[MAX_JOINTS];
+        for (int i = 0; i < MAX_JOINTS; i++){
+            jointMatrices[i] = new Matrix4d();
+        }
     }
 
     @Override
-    public Matrix4f[] getJointMatrices() {
+    public Matrix4d[] getJointMatrices() {
         return jointMatrices;
     }
 
     @Override
-    public Matrix4f getJointMatrix(int index) {
+    public Matrix4d getJointMatrix(int index) {
         return jointMatrices[index];
     }
 
     @Override
-    public Matrix4f getLocalJointMatrix(int index){
-        return localJointMatrices[index];
+    public void setJointMatrix(int index, Matrix4d mat) {
+        jointMatrices[index].set(mat);
     }
 
-    @Override
-    public Matrix4f[] getLocalJointMatrices() {
-        return localJointMatrices;
-    }
-
-    public void setMatrix(int pos, Matrix4f localJointMatrix, Matrix4f invJointMatrix) {
-        localJointMatrices[pos] = localJointMatrix;
-
-        jointMatrices[pos] = invJointMatrix.mul(localJointMatrix);
-    }
 }

@@ -1,13 +1,15 @@
 package com.chaosbuffalo.bonetown.core.bonemf;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.Utils;
-import com.chaosbuffalo.bonetown.core.model.BTAnimatedMesh;
-import com.chaosbuffalo.bonetown.core.model.BTMesh;
+import com.chaosbuffalo.bonetown.core.utils.Utils;
+import com.chaosbuffalo.bonetown.core.model.BakedAnimatedMesh;
+import com.chaosbuffalo.bonetown.core.model.BakedMesh;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
+import org.joml.Matrix4d;
+import org.joml.Vector4d;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,10 +19,12 @@ public class BoneMFModel {
     private final BoneMFNode rootNode;
     private final boolean hasSkeleton;
     private final BoneMFSkeleton skeleton;
+    private final ResourceLocation name;
 
 
-    public BoneMFModel(BoneMFNode rootNode){
+    public BoneMFModel(ResourceLocation name, BoneMFNode rootNode){
         this.rootNode = rootNode;
+        this.name = name;
         BoneMFNode skeletonRoot = rootNode.getNodeWithAttributeType(BoneMFAttribute.AttributeTypes.SKELETON);
 
         if (skeletonRoot != null){
@@ -36,6 +40,10 @@ public class BoneMFModel {
         }
     }
 
+    public ResourceLocation getName() {
+        return name;
+    }
+
     public Optional<BoneMFSkeleton> getSkeleton() {
         return Optional.ofNullable(skeleton);
     }
@@ -44,19 +52,19 @@ public class BoneMFModel {
         return hasSkeleton;
     }
 
-    public List<BTAnimatedMesh> getBakeAsAnimatedMeshes(){
-        List<BTMesh> meshes = bakeMeshes();
-        List<BTAnimatedMesh> animated = new ArrayList<>();
-        for (BTMesh mesh : meshes){
-            if (mesh instanceof BTAnimatedMesh){
-                animated.add((BTAnimatedMesh) mesh);
+    public List<BakedAnimatedMesh> getBakeAsAnimatedMeshes(){
+        List<BakedMesh> meshes = bakeMeshes();
+        List<BakedAnimatedMesh> animated = new ArrayList<>();
+        for (BakedMesh mesh : meshes){
+            if (mesh instanceof BakedAnimatedMesh){
+                animated.add((BakedAnimatedMesh) mesh);
             }
         }
         return animated;
     }
 
-    public List<BTMesh> bakeMeshes(){
-        List<BTMesh> meshes = new ArrayList<>();
+    public List<BakedMesh> bakeMeshes(){
+        List<BakedMesh> meshes = new ArrayList<>();
         List<BoneMFNode> meshNodes = getRootNode().getNodesOfType(BoneMFAttribute.AttributeTypes.MESH);
         for (BoneMFNode meshNode : meshNodes){
             BoneMFMeshAttribute meshAttribute = meshNode.getMesh();
@@ -70,17 +78,22 @@ public class BoneMFModel {
             List<Float> positions = new ArrayList<>();
             List<Float> uvs = new ArrayList<>();
             List<Float> normals = new ArrayList<>();
+            Matrix4d transform = meshNode.getGlobalTransform();
             for (BoneMFVertex vertex : vertices){
-                positions.add((float) vertex.x);
-                positions.add((float) vertex.y);
-                positions.add((float) vertex.z);
+                Vector4d posVec = new Vector4d(vertex.x, vertex.y, vertex.z, 1.0);
+                posVec.mulAffine(transform, posVec);
+                Vector4d normVec = new Vector4d(vertex.nX, vertex.nY, vertex.nZ, 0.0);
+                normVec.mul(transform, normVec);
+                positions.add((float) posVec.x());
+                positions.add((float) posVec.y());
+                positions.add((float) posVec.z());
                 uvs.add((float) vertex.u);
                 uvs.add((float) vertex.v);
-                normals.add((float) vertex.nX);
-                normals.add((float) vertex.nY);
-                normals.add((float) vertex.nZ);
+                normals.add((float) normVec.x());
+                normals.add((float) normVec.y());
+                normals.add((float) normVec.z());
             }
-            BTMesh mesh;
+            BakedMesh mesh;
             if (getSkeleton().isPresent()){
                 BoneMFSkeleton skeleton = getSkeleton().get();
                 List<Integer> boneIds = new ArrayList<>();
@@ -99,11 +112,11 @@ public class BoneMFModel {
                         }
                     }
                 }
-                mesh = new BTAnimatedMesh(meshNode.getName(), Utils.listToArray(positions),
+                mesh = new BakedAnimatedMesh(meshNode.getName(), Utils.listToArray(positions),
                         Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles),
                         Utils.listToArray(boneWeights), Utils.listIntToArray(boneIds));
             } else {
-                mesh = new BTMesh(meshNode.getName(), Utils.listToArray(positions),
+                mesh = new BakedMesh(meshNode.getName(), Utils.listToArray(positions),
                         Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles));
             }
             meshes.add(mesh);

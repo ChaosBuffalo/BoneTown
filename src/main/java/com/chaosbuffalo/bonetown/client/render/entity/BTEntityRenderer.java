@@ -35,7 +35,6 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         this.model = model;
         this.activeEntities = new HashMap<>();
         this.modelRenderData = new BTModelRenderData(model, renderManager);
-
     }
 
     @Override
@@ -76,6 +75,10 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         program.endRender(renderType);
     }
 
+    private void initializeRender(IBTShaderProgram program){
+        modelRenderData.GLinit();
+    }
+
     @Override
     public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn,
                        IRenderTypeBuffer bufferIn, int packedLightIn) {
@@ -84,13 +87,13 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         boolean visibleToPlayer = !visible && !entityIn.isInvisibleToPlayer(Minecraft.getInstance().player);
         RenderType rendertype = this.getRenderType(entityIn, visible, visibleToPlayer);
         bufferIn.getBuffer(rendertype);
+        IBTShaderProgram program = BTShaderResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
         if (!modelRenderData.isInitialized()){
-            modelRenderData.GLinit();
+           initializeRender(program);
         }
         GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
         Matrix4f projMatrix = gameRenderer.getProjectionMatrix(gameRenderer.getActiveRenderInfo(), partialTicks,
                 true);
-        IBTShaderProgram program = BTShaderResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
         int packedOverlay;
         if (entityIn instanceof LivingEntity){
             packedOverlay = LivingRenderer.getPackedOverlay((LivingEntity) entityIn, partialTicks);

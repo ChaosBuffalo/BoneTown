@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.client.shader.ShaderLoader;
+import org.joml.Matrix4d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,18 @@ public class BTShaderProgram implements IBTShaderProgram {
         for (BTShaderUniform uniform : uniforms){
             uniform.bindUniform(program);
         }
+    }
+
+    @Override
+    public void uploadAnimationFrame(Matrix4d[] joints) {
+        BoneTown.LOGGER.warn("BTShaderProgram does not support animation, skipping uploadAnimationFrame. " +
+                "Use AnimatedShaderProgram instead.");
+    }
+
+    @Override
+    public void uploadInverseBindPose(Matrix4d[] bindPose) {
+        BoneTown.LOGGER.warn("BTShaderProgram does not support animation, skipping uploadInverseBindPose. " +
+                "Use AnimatedShaderProgram instead.");
     }
 
 

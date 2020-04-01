@@ -4,10 +4,11 @@ import com.chaosbuffalo.bonetown.client.render.entity.DebugBoneRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestAnimatedRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
+import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
 import com.chaosbuffalo.bonetown.core.proxy.IBTProxy;
 import com.chaosbuffalo.bonetown.core.proxy.ServerProxy;
-import com.chaosbuffalo.bonetown.init.ModEntityTypes;
+import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -49,7 +50,7 @@ public class BoneTown
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
-        ModEntityTypes.ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BTEntityTypes.ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -60,19 +61,21 @@ public class BoneTown
 
         BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
         BoneTownRegistry.ADDITIONAL_ANIMATION_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
+        BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().getModel().getSkeleton()
+                .ifPresent(BoneMFSkeleton::bakeAnimations));
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
         LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
         RenderingRegistry.registerEntityRenderingHandler(
-                ModEntityTypes.TEST_ENTITY.get(),
+                BTEntityTypes.TEST_ENTITY.get(),
                 TestRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(
-                ModEntityTypes.TEST_ANIMATED_ENTITY.get(),
+                BTEntityTypes.TEST_ANIMATED_ENTITY.get(),
                 TestAnimatedRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(
-                ModEntityTypes.DEBUG_BONE_ENTITY.get(),
+                BTEntityTypes.DEBUG_BONE_ENTITY.get(),
                 DebugBoneRenderer::new);
         LOGGER.debug("Registered Entity Renderers");
 

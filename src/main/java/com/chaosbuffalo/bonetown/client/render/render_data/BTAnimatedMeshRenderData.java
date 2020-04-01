@@ -1,6 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.render_data;
 
-import com.chaosbuffalo.bonetown.core.model.BTAnimatedMesh;
+import com.chaosbuffalo.bonetown.core.model.BakedAnimatedMesh;
 import com.chaosbuffalo.bonetown.client.render.platform.GlStateManagerExtended;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static com.chaosbuffalo.bonetown.core.animation.BTSkeleton.MAX_WEIGHTS;
+import static com.chaosbuffalo.bonetown.core.bonemf.BoneMFModel.MAX_WEIGHTS;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
@@ -18,9 +18,9 @@ import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 @OnlyIn(Dist.CLIENT)
 public class BTAnimatedMeshRenderData extends BTMeshRenderData {
 
-    private final BTAnimatedMesh animatedMesh;
+    private final BakedAnimatedMesh animatedMesh;
 
-    public BTAnimatedMeshRenderData(BTAnimatedMesh mesh){
+    public BTAnimatedMeshRenderData(BakedAnimatedMesh mesh){
         super(mesh);
         this.animatedMesh = mesh;
     }

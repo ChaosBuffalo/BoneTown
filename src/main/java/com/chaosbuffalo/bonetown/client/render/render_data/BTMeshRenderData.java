@@ -1,6 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.render_data;
 
-import com.chaosbuffalo.bonetown.core.model.BTMesh;
+import com.chaosbuffalo.bonetown.core.model.BakedMesh;
 import com.chaosbuffalo.bonetown.client.render.platform.GlStateManagerExtended;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,12 +22,12 @@ import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 
 @OnlyIn(Dist.CLIENT)
 public class BTMeshRenderData implements IBTRenderData {
-    private final BTMesh mesh;
+    private final BakedMesh mesh;
     private int vaoId;
     private List<Integer> vboIdList;
     private int vertexCount;
 
-    public BTMeshRenderData(BTMesh mesh){
+    public BTMeshRenderData(BakedMesh mesh){
         this.mesh = mesh;
         this.vertexCount = mesh.indices.length;
         vboIdList = new ArrayList<>();

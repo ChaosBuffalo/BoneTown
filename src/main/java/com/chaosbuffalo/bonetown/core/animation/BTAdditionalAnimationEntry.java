@@ -3,7 +3,7 @@ package com.chaosbuffalo.bonetown.core.animation;
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
 import com.chaosbuffalo.bonetown.core.BoneTownConstants;
-import com.chaosbuffalo.bonetown.core.assimp.AssimpMeshLoader;
+import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModelLoader;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
 import net.minecraft.client.Minecraft;
@@ -29,7 +29,7 @@ public class BTAdditionalAnimationEntry implements IForgeRegistryEntry<BTAdditio
         this.name = name;
         this.modelName = modelName;
         this.animationFile = animationFile;
-        this.meshType = BoneTownConstants.MeshTypes.FBX;
+        this.meshType = BoneTownConstants.MeshTypes.BONEMF;
     }
 
     @Override
@@ -45,31 +45,30 @@ public class BTAdditionalAnimationEntry implements IForgeRegistryEntry<BTAdditio
                 BoneTownConstants.BONETOWN_ANIMATIONS_DIR +
                         "/" + animationFile.getPath() + "." + meshExt);
         BTModel model = BoneTownRegistry.MODEL_REGISTRY.getValue(this.modelName);
-//        if (model instanceof BTAnimatedModel){
-//            BTAnimatedModel animatedModel = (BTAnimatedModel) model;
-//            try {
-//                InputStream stream = Minecraft.getInstance().getResourceManager()
-//                        .getResource(animLocation)
-//                        .getInputStream();
-//                byte[] _data = IOUtils.toByteArray(stream);
-//                ByteBuffer data = MemoryUtil.memCalloc(_data.length + 1);
-//                data.put(_data);
-//                data.put((byte) 0);
-//                data.flip();
-//                stream.close();
-//                try {
-//                    AssimpMeshLoader.loadAnimationsForSkeleton(data, name, animatedModel.getSkeleton());
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                MemoryUtil.memFree(data);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            BoneTown.LOGGER.error("Trying to load {} additional animations for model: {}, " +
-//                    "but model wasn't found or it is not animated", getRegistryName(), modelName);
-//        }
+        if (model instanceof BTAnimatedModel){
+            try {
+                InputStream stream = Minecraft.getInstance().getResourceManager()
+                        .getResource(animLocation)
+                        .getInputStream();
+                byte[] _data = IOUtils.toByteArray(stream);
+                ByteBuffer data = MemoryUtil.memCalloc(_data.length + 1);
+                data.put(_data);
+                data.put((byte) 0);
+                data.flip();
+                stream.close();
+                try {
+                    BoneMFModelLoader.loadAdditionalAnimations(model.getModel(), data, name);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                MemoryUtil.memFree(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            BoneTown.LOGGER.error("Trying to load {} additional animations for model: {}, " +
+                    "but model wasn't found or it is not animated", getRegistryName(), modelName);
+        }
 
 
     }

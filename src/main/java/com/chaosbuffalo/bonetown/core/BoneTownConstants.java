@@ -12,18 +12,17 @@ public class BoneTownConstants {
 
 
     public enum MeshTypes {
-        FBX,
+        INVALID,
         BONEMF
     }
 
     public static String stringFromMeshType(MeshTypes type){
         switch (type) {
-            case FBX:
-                return "fbx";
             case BONEMF:
                 return "bonemf";
+            case INVALID:
             default:
-                return "";
+                return "invalid";
         }
     }
 }

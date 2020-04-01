@@ -1,7 +1,7 @@
 package com.chaosbuffalo.bonetown.entity;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.init.ModEntityTypes;
+import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
@@ -25,7 +25,7 @@ public class TestEntity extends Entity {
     }
 
     public TestEntity(final World world) {
-        this(ModEntityTypes.TEST_ENTITY.get(), world);
+        this(BTEntityTypes.TEST_ENTITY.get(), world);
     }
 
 

@@ -16,6 +16,7 @@ flat out vec3 normal;
 uniform mat4 model_view;
 uniform mat4 proj_mat;
 uniform mat4 joints_matrix[MAX_JOINTS];
+uniform mat4 inverse_bind_pose[MAX_JOINTS];
 
 void main()
 {
@@ -28,9 +29,9 @@ void main()
         float weight = jointWeights[i];
         if(weight > 0) {
             int jointIndex = jointIndices[i];
-            vec4 tmpPos = joints_matrix[jointIndex] * vec4(position, 1.0);
+            vec4 tmpPos = joints_matrix[jointIndex] * inverse_bind_pose[jointIndex] * vec4(position, 1.0);
             initPos += weight * tmpPos;
-            vec4 tmpNormal = joints_matrix[jointIndex] * vec4(vertexNormal, 0.0);
+            vec4 tmpNormal = joints_matrix[jointIndex] * inverse_bind_pose[jointIndex] * vec4(vertexNormal, 0.0);
             initNormal += weight * tmpNormal;
         }
     }

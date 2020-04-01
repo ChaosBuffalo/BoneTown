@@ -3,7 +3,7 @@ package com.chaosbuffalo.bonetown.core.model;
 import com.chaosbuffalo.bonetown.core.BoneTownConstants;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModel;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModelLoader;
-import com.chaosbuffalo.bonetown.init.ModShaderData;
+import com.chaosbuffalo.bonetown.init.BTShaders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -22,10 +22,10 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
     private ResourceLocation programName;
     public final BoneTownConstants.MeshTypes meshType;
     protected BoneMFModel model;
-    private BTMesh[] meshes;
+    private BakedMesh[] meshes;
 
     public BTModel(ResourceLocation name, BoneTownConstants.MeshTypes meshType){
-        this(name, ModShaderData.DEFAULT_STATIC_LOC, meshType);
+        this(name, BTShaders.DEFAULT_STATIC_LOC, meshType);
     }
 
 
@@ -36,8 +36,12 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
         this.programName = programName;
     }
 
-    public BTMesh[] getMeshes(){
+    public BakedMesh[] getMeshes(){
         return meshes;
+    }
+
+    public BoneMFModel getModel() {
+        return model;
     }
 
     public void load(){
@@ -58,7 +62,7 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
             stream.close();
             try {
                 this.model = BoneMFModelLoader.load(data, name);
-                this.meshes = model.bakeMeshes().toArray(new BTMesh[0]);
+                this.meshes = model.bakeMeshes().toArray(new BakedMesh[0]);
             } catch (Exception e) {
                 e.printStackTrace();
             }

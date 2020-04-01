@@ -1,9 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.render_data;
 
-import com.chaosbuffalo.bonetown.client.render.render_data.BTAnimatedMeshRenderData;
-import com.chaosbuffalo.bonetown.client.render.render_data.BTModelRenderData;
-import com.chaosbuffalo.bonetown.client.render.render_data.IBTRenderData;
-import com.chaosbuffalo.bonetown.core.model.BTAnimatedMesh;
+import com.chaosbuffalo.bonetown.core.model.BakedAnimatedMesh;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 
@@ -22,7 +19,7 @@ public class BTAnimatedModelRenderData extends BTModelRenderData {
     @Override
     public Map<String, IBTRenderData> getRenderData() {
         HashMap<String, IBTRenderData> ret = new HashMap<>();
-        for (BTAnimatedMesh mesh : animatedModel.getAnimatedMeshes()){
+        for (BakedAnimatedMesh mesh : animatedModel.getAnimatedMeshes()){
             ret.put(mesh.name, new BTAnimatedMeshRenderData(mesh));
         }
         return ret;

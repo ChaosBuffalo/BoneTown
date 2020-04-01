@@ -1,8 +1,6 @@
 package com.chaosbuffalo.bonetown.core.bonemf;
 
-import com.chaosbuffalo.bonetown.BoneTown;
 import org.joml.Matrix4d;
-import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector4d;
 
@@ -80,7 +78,7 @@ public class BoneMFNode {
         this.name = name;
         this.children = new ArrayList<>();
         this.attributes = new ArrayList<>();
-        this.dirty = false;
+        this.dirty = true;
         this.parent = null;
         this._globalTransform = null;
         this.inheritType = InheritTypes.UNKNOWN;
@@ -261,83 +259,165 @@ public class BoneMFNode {
 
     private Vector4d toVec4d(Vector3d otherVec) { return new Vector4d(otherVec.x, otherVec.y, otherVec.z, 1.0); }
 
+    public static Matrix4d constructRotationMatrix(Vector4d vec){
+        return new Matrix4d().rotateAffineZYX(vec.z(), vec.y(), vec.x());
+    }
+
+    private Matrix4d extractRotation(Matrix4d matIn){
+        Vector3d eulerRot = new Vector3d();
+        matIn.getEulerAnglesZYX(eulerRot);
+        return new Matrix4d().rotateAffineZYX(eulerRot.z, eulerRot.y, eulerRot.x);
+    }
+
     public Matrix4d calculateGlobalTransform(Vector4d translation, Vector4d rotation, Vector4d scale){
-        Matrix4d mTranslation = new Matrix4d().translateLocal(fromVec4d(translation));
-        Matrix4d mRotation = new Matrix4d().rotateAffineXYZ(rotation.x, rotation.y, rotation.z);
-        Matrix4d mPostRotation = new Matrix4d().rotateAffineXYZ(getPostRotation().x, getPostRotation().y, getPostRotation().z);
-        Matrix4d mPreRotation = new Matrix4d().rotateAffineXYZ(getPreRotation().x, getPreRotation().y, getPreRotation().z);
+//        BoneTown.LOGGER.info("==== Starting Node Transform Calculation: {}", getName());
+
+
+
+        Matrix4d mTranslation = new Matrix4d().translation(fromVec4d(translation));
+        Matrix4d mRotation = constructRotationMatrix(rotation);
+        Matrix4d mPostRotation = constructRotationMatrix(getPostRotation());
+        Matrix4d mPreRotation = constructRotationMatrix(getPreRotation());
         Matrix4d mScaling = new Matrix4d().scale(fromVec4d(scale));
-        Matrix4d mScalingOffset = new Matrix4d().translateLocal(fromVec4d(getScalingOffset()));
-        Matrix4d mScalingPivot = new Matrix4d().translateLocal(fromVec4d(getScalingPivot()));
-        Matrix4d mRotationOffset = new Matrix4d().translateLocal(fromVec4d(getRotationOffset()));
-        Matrix4d mRotationPivot = new Matrix4d().translateLocal(fromVec4d(getRotationPivot()));
+        Matrix4d mScalingOffset = new Matrix4d().translation(fromVec4d(getScalingOffset()));
+        Matrix4d mScalingPivot = new Matrix4d().translation(fromVec4d(getScalingPivot()));
+        Matrix4d mRotationOffset = new Matrix4d().translation(fromVec4d(getRotationOffset()));
+        Matrix4d mRotationPivot = new Matrix4d().translation(fromVec4d(getRotationPivot()));
+
+//        BoneTown.LOGGER.info("mTranslation \n {} \n", mTranslation.toString());
+//        BoneTown.LOGGER.info("vRotation {}", rotation.toString());
+//        BoneTown.LOGGER.info("mRotation \n {} \n", mRotation.toString());
+//        BoneTown.LOGGER.info("vPostRotation {}", postRotation.toString());
+//        BoneTown.LOGGER.info("mPostRotation \n {} \n", mPostRotation.toString());
+//        BoneTown.LOGGER.info("vPreRotation {}", preRotation.toString());
+//        BoneTown.LOGGER.info("mPreRotation \n {} \n", mPreRotation.toString());
+//        BoneTown.LOGGER.info("mScaling \n {} \n", mScaling.toString());
+//        BoneTown.LOGGER.info("mScalingOffset \n {} \n", mScalingOffset.toString());
+//        BoneTown.LOGGER.info("mScalingPivot \n {} \n", mScalingPivot.toString());
+//        BoneTown.LOGGER.info("mRotationOffset \n {} \n", mPostRotation.toString());
+//        BoneTown.LOGGER.info("mRotationPivot \n {} \n", mRotationPivot.toString());
+
+
 
         Matrix4d parentGlobal;
         if (getParent() != null){
-            parentGlobal = this.getParent().calculateGlobalTransform();
+            parentGlobal = new Matrix4d(this.getParent().calculateGlobalTransform());
         } else {
             parentGlobal = new Matrix4d();
         }
 
-        Quaterniond rotQuat = new Quaterniond();
-        parentGlobal.getUnnormalizedRotation(rotQuat);
-        Vector3d eulerRot = new Vector3d();
-        rotQuat.getEulerAnglesXYZ(eulerRot);
+//        BoneTown.LOGGER.info("parent Global: \n {} \n", parentGlobal.toString());
 
-        Matrix4d parentGlobalRot = new Matrix4d().rotateAffineXYZ(eulerRot.x, eulerRot.y, eulerRot.z);
-        Matrix4d localRotMat = new Matrix4d().mulLocalAffine(mPreRotation).mulLocalAffine(mRotation)
+        Matrix4d parentGlobalRot = extractRotation(parentGlobal);
+
+//        BoneTown.LOGGER.info("parent global rot: \n {} \n", parentGlobalRot.toString());
+
+        Matrix4d localRotMat = new Matrix4d(mPreRotation).mulLocalAffine(mRotation)
                 .mulLocalAffine(mPostRotation);
+
+//        BoneTown.LOGGER.info("local rot mat: \n {} \n", localRotMat.toString());
 
         Vector3d parentTrans = new Vector3d();
         parentGlobal.getTranslation(parentTrans);
         Matrix4d parentGlobalTrans = new Matrix4d().translateLocal(parentTrans);
-        Matrix4d parentGlobalRotScale = new Matrix4d(parentGlobalTrans).invertAffine().mulLocalAffine(parentGlobal);
-        Matrix4d parentGlobalScale = new Matrix4d(parentGlobalRot).invertAffine().mulLocalAffine(parentGlobalRotScale);
+
+//        BoneTown.LOGGER.info("parent global trans: \n {} \n", parentGlobalTrans.toString());
+
+        Matrix4d parentGlobalRotScale = new Matrix4d(parentGlobalTrans).invertAffine().mulAffine(parentGlobal);
+        Matrix4d parentGlobalScale = new Matrix4d(parentGlobalRot).invertAffine().mulAffine(parentGlobalRotScale);
         Matrix4d localScaling = new Matrix4d(mScaling);
+
+//        BoneTown.LOGGER.info("parent global rot scale: \n {} \n", parentGlobalRotScale.toString());
+//        BoneTown.LOGGER.info("parent global scale: \n {} \n", parentGlobalScale.toString());
+
 
         Matrix4d globalRotScale;
         switch (getInheritType()){
             case RRSS: {
-                globalRotScale = new Matrix4d(parentGlobalRot).mulLocalAffine(localRotMat)
-                        .mulLocalAffine(parentGlobalScale).mulLocalAffine(localScaling);
+                globalRotScale = new Matrix4d(parentGlobalRot).mulAffine(localRotMat)
+                        .mulAffine(parentGlobalScale).mulAffine(localScaling);
                 break;
             }
             case RSRS: {
-                globalRotScale = new Matrix4d(parentGlobalRot).mulLocalAffine(parentGlobalScale)
-                        .mulLocalAffine(localRotMat).mulLocalAffine(localScaling);
+                globalRotScale = new Matrix4d(parentGlobalRot).mulAffine(parentGlobalScale)
+                        .mulAffine(localRotMat).mulAffine(localScaling);
                 break;
             }
             case RRS: {
                 Matrix4d parentLocalScaling = new Matrix4d();
                 Vector4d parentScaling = getParent().getScaling();
                 parentLocalScaling.scale(fromVec4d(parentScaling));
-                Matrix4d parentGlobalScalingNoLocal = parentGlobalScale.mulLocalAffine(parentLocalScaling.invertAffine());
-                globalRotScale = new Matrix4d(parentGlobalRot).mulLocalAffine(localRotMat)
-                        .mulLocalAffine(parentGlobalScalingNoLocal).mulLocalAffine(localScaling);
+//                BoneTown.LOGGER.info("parent local scaling \n {}", parentLocalScaling.toString());
+                Matrix4d parentGlobalScalingNoLocal = parentGlobalScale.mulAffine(parentLocalScaling.invertAffine());
+//                BoneTown.LOGGER.info("Parent global scaling no local \n {}", parentGlobalScalingNoLocal.toString());
+                globalRotScale = new Matrix4d(parentGlobalRot).mulAffine(localRotMat)
+                        .mulAffine(parentGlobalScalingNoLocal).mulAffine(localScaling);
                 break;
             }
             case UNKNOWN:
             default: {
-                BoneTown.LOGGER.info("Unknown inheritance type, rotation probably broken");
+//                BoneTown.LOGGER.info("Unknown inheritance type, rotation probably broken");
                 globalRotScale = new Matrix4d();
                 break;
             }
         }
+
+//        BoneTown.LOGGER.info("Global rot scale: \n {} \n",
+//                globalRotScale.toString());
+
         Matrix4d mRotationPivotInverse = new Matrix4d(mRotationPivot).invertAffine();
         Matrix4d mScalingPivotInverse = new Matrix4d(mScalingPivot).invertAffine();
 
+//        BoneTown.LOGGER.info("rotation pivot inverse: \n {} \n", mRotationPivotInverse.toString());
 
-        Matrix4d localTransform = new Matrix4d(mTranslation).mulLocalAffine(mRotationOffset).mulLocalAffine(mRotationPivot)
-                .mulLocalAffine(mPreRotation).mulLocalAffine(mRotation).mulLocalAffine(mPostRotation)
-                .mulLocalAffine(mRotationPivotInverse).mulLocalAffine(mScalingOffset)
-                .mulLocalAffine(mScalingPivot).mulLocalAffine(mScaling).mulLocalAffine(mScalingPivotInverse);
+//        BoneTown.LOGGER.info("scaling pivot inverse: \n {} \n", mScalingPivotInverse.toString());
+
+
+        Matrix4d localTransform = new Matrix4d(mTranslation).mulAffine(mRotationOffset).mulAffine(mRotationPivot)
+                .mulAffine(mPreRotation).mulAffine(mRotation).mulAffine(mPostRotation)
+                .mulAffine(mRotationPivotInverse).mulAffine(mScalingOffset)
+                .mulAffine(mScalingPivot).mulAffine(mScaling).mulAffine(mScalingPivotInverse);
         Vector3d localTranslateWithPivotsOffsets = new Vector3d();
+
+//        BoneTown.LOGGER.info("local transform: \n {} \n", localTransform.toString());
+
         localTransform.getTranslation(localTranslateWithPivotsOffsets);
 
-        Vector4d globalTranslation = parentGlobal.transformAffine(toVec4d(localTranslateWithPivotsOffsets));
+//        BoneTown.LOGGER.info("pivot/offset translate: \n {} \n", localTranslateWithPivotsOffsets.toString());
+
+        Vector4d globalPos = new Vector4d();
+        toVec4d(localTranslateWithPivotsOffsets).mulAffine(parentGlobal, globalPos);
+
+//        BoneTown.LOGGER.info("global translation: \n {} \n", globalPos.toString());
+
         Matrix4d mGlobalTranslation = new Matrix4d();
-        mGlobalTranslation.translateLocal(fromVec4d(globalTranslation));
-        return mGlobalTranslation.mulLocalAffine(globalRotScale);
+        mGlobalTranslation.translateLocal(fromVec4d(globalPos));
+
+//        BoneTown.LOGGER.info("mGlobalTranslation: \n {} \n", mGlobalTranslation.toString());
+//
+//        BoneTown.LOGGER.info("mGlobalRotscale: \n {} \n", globalRotScale.toString());
+
+        return mGlobalTranslation.mulAffine(globalRotScale);
+    }
+
+    public Matrix4d calculateLocalTransform(Vector4d translation, Vector4d rotation, Vector4d scale){
+        Matrix4d mTranslation = new Matrix4d().translation(fromVec4d(translation));
+        Matrix4d mRotation = constructRotationMatrix(rotation);
+        Matrix4d mPostRotation = constructRotationMatrix(getPostRotation());
+        Matrix4d mPreRotation = constructRotationMatrix(getPreRotation());
+        Matrix4d mScaling = new Matrix4d().scale(fromVec4d(scale));
+        Matrix4d mScalingOffset = new Matrix4d().translation(fromVec4d(getScalingOffset()));
+        Matrix4d mScalingPivot = new Matrix4d().translation(fromVec4d(getScalingPivot()));
+        Matrix4d mRotationOffset = new Matrix4d().translation(fromVec4d(getRotationOffset()));
+        Matrix4d mRotationPivot = new Matrix4d().translation(fromVec4d(getRotationPivot()));
+        Matrix4d mRotationPivotInverse = new Matrix4d(mRotationPivot).invertAffine();
+        Matrix4d mScalingPivotInverse = new Matrix4d(mScalingPivot).invertAffine();
+
+        Matrix4d localTransform = new Matrix4d(mTranslation).mulAffine(mRotationOffset).mulAffine(mRotationPivot)
+                .mulAffine(mPreRotation).mulAffine(mRotation).mulAffine(mPostRotation)
+                .mulAffine(mRotationPivotInverse).mulAffine(mScalingOffset)
+                .mulAffine(mScalingPivot).mulAffine(mScaling).mulAffine(mScalingPivotInverse);
+        return localTransform;
     }
 
     public Matrix4d calculateGlobalTransform(){

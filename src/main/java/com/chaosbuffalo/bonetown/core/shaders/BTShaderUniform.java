@@ -234,6 +234,24 @@ public class BTShaderUniform implements AutoCloseable {
         }
     }
 
+    public void set(org.joml.Matrix4d... mats){
+        if (uniformType == UniformType.vecmat4x4){
+            int count = 0;
+            this.uniformFloatBuffer.position(0);
+            for (org.joml.Matrix4d mat : mats){
+                int offset = 16 * count;
+                mat.get(offset, this.uniformFloatBuffer);
+                count++;
+            }
+            this.markDirty();
+        }
+        else {
+            BoneTown.LOGGER.warn(
+                    "Trying to upload mat4x4 vector to non vecmat4x4 type uniform {}",
+                    this.getUniformName());
+        }
+    }
+
     public void set(org.joml.Matrix4f... mats){
         if (uniformType == UniformType.vecmat4x4){
             int count = 0;

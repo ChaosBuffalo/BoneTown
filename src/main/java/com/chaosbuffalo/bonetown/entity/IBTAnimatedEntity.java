@@ -2,19 +2,17 @@ package com.chaosbuffalo.bonetown.entity;
 
 
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
+import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
+import net.minecraft.entity.Entity;
 
-import java.util.Optional;
-
-public interface IBTAnimatedEntity {
+import javax.annotation.Nullable;
 
 
-    String getCurrentAnimation();
+public interface IBTAnimatedEntity<T extends Entity & IBTAnimatedEntity<T>> {
 
-    int getAnimationTicks();
+    AnimationComponent<T> getAnimationComponent();
 
-    boolean doLoopAnimation();
-
-    Optional<BoneMFSkeleton> getSkeleton();
-
+    @Nullable
+    BoneMFSkeleton getSkeleton();
 
 }

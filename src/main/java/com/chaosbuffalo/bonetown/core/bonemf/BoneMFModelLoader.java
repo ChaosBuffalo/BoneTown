@@ -22,11 +22,6 @@ public class BoneMFModelLoader {
         return new ByteBufferBackedInputStream(buffer);
     }
 
-    private static Vector4d vec4dFromCBOR(CBORObject cbor){
-        return new Vector4d(cbor.get(0).AsDouble(), cbor.get(1).AsDouble(),
-                cbor.get(2).AsDouble(), cbor.get(3).AsDouble());
-    }
-
     private static BoneMFVertex parseVertex(CBORObject cbor){
         double nX = cbor.get("nX").AsDouble();
         double nY = cbor.get("nY").AsDouble();
@@ -115,6 +110,40 @@ public class BoneMFModelLoader {
                 vec.get(2).AsDouble(), vec.get(3).AsDouble());
     }
 
+
+    private static BoneMFNodeFrame parseNodeFrame(CBORObject channelFrame){
+        BoneMFNodeFrame mfFrame = new BoneMFNodeFrame();
+        mfFrame.setRotation(parseVector(channelFrame.get("rotation")));
+        mfFrame.setTranslation(parseVector(channelFrame.get("translation")));
+        mfFrame.setScale(parseVector(channelFrame.get("scale")));
+        return mfFrame;
+    }
+
+    private static BoneMFAnimationChannel parseAnimationChannel(String nodeName, CBORObject channelCbor){
+        BoneMFAnimationChannel channel = new BoneMFAnimationChannel(nodeName);
+        for (CBORObject channelFrame : channelCbor.getValues()){
+            channel.addNodeFrame(parseNodeFrame(channelFrame));
+        }
+        return channel;
+    }
+
+    private static BoneMFAnimation parseAnimation(String animationName, CBORObject animationCbor){
+        BoneMFAnimation animation = new BoneMFAnimation(animationName);
+        CBORObject channels = animationCbor.get("channels");
+        long frameCount = animationCbor.get("frameCount").AsInt64Value();
+        double frameRate = animationCbor.get("frameRate").AsDouble();
+        animation.setFrameCount(frameCount);
+        animation.setFrameRate(frameRate);
+        if (!channels.isNull()){
+            for (CBORObject key : channels.getKeys()){
+                String channelName = key.AsString();
+                CBORObject channelCbor = channels.get(channelName);
+                animation.addChannel(channelName, parseAnimationChannel(channelName, channelCbor));
+            }
+        }
+        return animation;
+    }
+
     private static BoneMFNode parseNode(CBORObject node){
         String nodeName = node.get("name").AsString();
         BoneTown.LOGGER.info("CBOR Found node: {}", nodeName);
@@ -122,15 +151,15 @@ public class BoneMFModelLoader {
         BoneMFNode mfNode = new BoneMFNode(nodeName);
         String inheritType = node.get("inheritType").AsString();
         mfNode.setInheritType(BoneMFNode.getInheritTypeFromString(inheritType));
-        mfNode.setPostRotation(vec4dFromCBOR(node.get("postRotation")));
-        mfNode.setPreRotation(vec4dFromCBOR(node.get("preRotation")));
-        mfNode.setRotation(vec4dFromCBOR(node.get("rotation")));
-        mfNode.setRotationOffset(vec4dFromCBOR(node.get("rotationOffset")));
-        mfNode.setRotationPivot(vec4dFromCBOR(node.get("rotationPivot")));
-        mfNode.setScaling(vec4dFromCBOR(node.get("scaling")));
-        mfNode.setScalingOffset(vec4dFromCBOR(node.get("scalingOffset")));
-        mfNode.setScalingPivot(vec4dFromCBOR(node.get("scalingPivot")));
-        mfNode.setTranslation(vec4dFromCBOR(node.get("translation")));
+        mfNode.setPostRotation(parseVector(node.get("postRotation")));
+        mfNode.setPreRotation(parseVector(node.get("preRotation")));
+        mfNode.setRotation(parseVector(node.get("rotation")));
+        mfNode.setRotationOffset(parseVector(node.get("rotationOffset")));
+        mfNode.setRotationPivot(parseVector(node.get("rotationPivot")));
+        mfNode.setScaling(parseVector(node.get("scaling")));
+        mfNode.setScalingOffset(parseVector(node.get("scalingOffset")));
+        mfNode.setScalingPivot(parseVector(node.get("scalingPivot")));
+        mfNode.setTranslation(parseVector(node.get("translation")));
         mfNode.setGlobalTransform(parseMatrix(node.get("global")));
 
         CBORObject attributes = node.get("attributes");
@@ -148,8 +177,31 @@ public class BoneMFModelLoader {
                 mfNode.addChild(childNode);
             }
         }
-        BoneTown.LOGGER.info(mfNode.toString());
+//        BoneTown.LOGGER.info(mfNode.toString());
         return mfNode;
+    }
+
+    public static void loadAnimations(BoneMFModel model, CBORObject animationsCbor, ResourceLocation name){
+        model.getSkeleton().ifPresent((BoneMFSkeleton skeleton) -> {
+            for (CBORObject key : animationsCbor.getKeys()){
+                String animationName = key.AsString();
+                CBORObject animationCbor = animationsCbor.get(animationName);
+                ResourceLocation newName = new ResourceLocation(name.getNamespace(),
+                        name.getPath() + "." + animationName);
+                skeleton.addAnimation(newName, parseAnimation(animationName, animationCbor));
+            }
+        });
+    }
+
+    public static void loadAdditionalAnimations(BoneMFModel model, ByteBuffer resource, ResourceLocation name){
+        InputStream iStream = BoneMFModelLoader.asInputStream(resource);
+        CBORObject cbor = CBORObject.Read(iStream);
+        if (cbor.ContainsKey("animations")){
+            CBORObject animations = cbor.get("animations");
+            if (!animations.isNull()){
+                loadAnimations(model, animations, name);
+            }
+        }
     }
 
     public static BoneMFModel load(ByteBuffer resource, ResourceLocation name)
@@ -159,13 +211,24 @@ public class BoneMFModelLoader {
         CBORObject cbor = CBORObject.Read(stream);
         CBORObject nodes = cbor.get("nodes");
         BoneMFNode root = new BoneMFNode(name.toString());
-        for (CBORObject node : nodes.getValues()){
-            BoneMFNode mfNode = parseNode(node);
-            root.addChild(mfNode);
+        if (!nodes.isNull()){
+            for (CBORObject node : nodes.getValues()){
+                BoneMFNode mfNode = parseNode(node);
+                root.addChild(mfNode);
+                mfNode.setParent(root);
+            }
+            BoneMFNode firstChild = root.getChildren().get(0);
+            root.setInheritType(firstChild.getInheritType());
         }
-        BoneMFNode firstChild = root.getChildren().get(0);
-        root.setInheritType(firstChild.getInheritType());
-        return new BoneMFModel(root);
+        BoneMFModel model = new BoneMFModel(name, root);
+        if (cbor.ContainsKey("animations")){
+            CBORObject animations = cbor.get("animations");
+            if (!animations.isNull()){
+                loadAnimations(model, animations, name);
+            }
+        }
+
+        return model;
     }
 
 }

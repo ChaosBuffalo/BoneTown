@@ -1,8 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.render_data;
 
-import com.chaosbuffalo.bonetown.client.render.render_data.BTMeshRenderData;
-import com.chaosbuffalo.bonetown.client.render.render_data.IBTRenderData;
-import com.chaosbuffalo.bonetown.core.model.BTMesh;
+import com.chaosbuffalo.bonetown.core.model.BakedMesh;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +27,7 @@ public class BTModelRenderData {
 
     public Map<String, IBTRenderData> getRenderData() {
         HashMap<String, IBTRenderData> ret = new HashMap<>();
-        for (BTMesh mesh : model.getMeshes()){
+        for (BakedMesh mesh : model.getMeshes()){
             ret.put(mesh.name, new BTMeshRenderData(mesh));
         }
         return ret;

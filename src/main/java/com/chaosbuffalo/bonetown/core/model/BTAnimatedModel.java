@@ -1,11 +1,10 @@
 package com.chaosbuffalo.bonetown.core.model;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.animation.BTSkeleton;
 import com.chaosbuffalo.bonetown.core.BoneTownConstants;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModelLoader;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
-import com.chaosbuffalo.bonetown.init.ModShaderData;
+import com.chaosbuffalo.bonetown.init.BTShaders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
@@ -19,7 +18,7 @@ import java.util.Optional;
 
 public class BTAnimatedModel extends BTModel {
 
-    private BTAnimatedMesh[] animatedMeshes;
+    private BakedAnimatedMesh[] animatedMeshes;
 
     public BTAnimatedModel(ResourceLocation name, ResourceLocation programName,
                            BoneTownConstants.MeshTypes meshType) {
@@ -27,11 +26,11 @@ public class BTAnimatedModel extends BTModel {
     }
 
     public BTAnimatedModel(ResourceLocation name, BoneTownConstants.MeshTypes meshType){
-        this(name, ModShaderData.DEFAULT_ANIMATED_LOC, meshType);
+        this(name, BTShaders.DEFAULT_ANIMATED_LOC, meshType);
     }
 
     @Override
-    public BTMesh[] getMeshes(){
+    public BakedMesh[] getMeshes(){
         return animatedMeshes;
     }
 
@@ -39,7 +38,7 @@ public class BTAnimatedModel extends BTModel {
         return this.model.getSkeleton();
     }
 
-    public BTAnimatedMesh[] getAnimatedMeshes() { return animatedMeshes; }
+    public BakedAnimatedMesh[] getAnimatedMeshes() { return animatedMeshes; }
 
 
     @Override
@@ -62,7 +61,7 @@ public class BTAnimatedModel extends BTModel {
             try {
                 model = BoneMFModelLoader.load(data, name);
                 this.animatedMeshes = model.getBakeAsAnimatedMeshes()
-                        .toArray(new BTAnimatedMesh[0]);
+                        .toArray(new BakedAnimatedMesh[0]);
                 BoneTown.LOGGER.info("Loaded {} animated meshes for {}", animatedMeshes.length, name.toString());
             } catch (Exception e) {
                 e.printStackTrace();
