@@ -19,6 +19,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
     private final AnimationFrame workFrame;
     private static final AnimationFrame DEFAULT_FRAME = new AnimationFrame();
     private int lastPoseFetch;
+    private float lastPartialTicks;
     private String currentState;
     public static final String INVALID_STATE = "invalid";
 
@@ -29,6 +30,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         animationStates = new HashMap<>();
         workFrame = new AnimationFrame();
         lastPoseFetch = -1;
+        lastPartialTicks = 0;
         currentState = INVALID_STATE;
     }
 
@@ -70,9 +72,17 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         }
     }
 
+    protected boolean isSamePose(float partialTicks){
+        return ticks == lastPoseFetch && partialTicks == lastPartialTicks;
+    }
+
+
+    public IPose getCurrentPose(){
+        return getCurrentPose(0);
+    }
+
     public IPose getCurrentPose(float partialTicks){
-        if (ticks == lastPoseFetch){
-            BoneTown.LOGGER.info("Returning last pose fetch");
+        if (isSamePose(partialTicks)){
             return workFrame;
         }
         if (getCurrentState().equals(INVALID_STATE)){
@@ -81,9 +91,9 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         }
         AnimationState<T> state = getState(getCurrentState());
         if (state != null){
-            BoneTown.LOGGER.info("Applying pose");
             state.applyToPose(ticks, partialTicks, workFrame);
             lastPoseFetch = ticks;
+            lastPartialTicks = partialTicks;
             return workFrame;
         } else {
             BoneTown.LOGGER.warn("Animation for entity: {} state not found: {}",
