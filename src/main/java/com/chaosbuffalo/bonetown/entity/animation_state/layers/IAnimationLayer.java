@@ -1,7 +1,8 @@
-package com.chaosbuffalo.bonetown.entity.animation_state;
+package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 
 public interface IAnimationLayer<T extends Entity & IBTAnimatedEntity> {
@@ -19,6 +20,8 @@ public interface IAnimationLayer<T extends Entity & IBTAnimatedEntity> {
     boolean shouldAutoStart();
 
     boolean shouldRun();
+
+    void receiveLayerMessage(AnimationLayerMessage message);
 
     String getLayerName();
 

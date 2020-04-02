@@ -6,7 +6,7 @@ import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationState;
-import com.chaosbuffalo.bonetown.entity.animation_state.FullBodyPoseLayer;
+import com.chaosbuffalo.bonetown.entity.animation_state.layers.FullBodyPoseLayer;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import com.chaosbuffalo.bonetown.init.BTModels;
 import net.minecraft.entity.Entity;

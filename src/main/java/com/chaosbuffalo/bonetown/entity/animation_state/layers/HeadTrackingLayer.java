@@ -1,9 +1,10 @@
-package com.chaosbuffalo.bonetown.entity.animation_state;
+package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFNode;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
+import com.chaosbuffalo.bonetown.entity.animation_state.layers.AnimationLayerBase;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4d;

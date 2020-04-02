@@ -4,6 +4,7 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -47,6 +48,14 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         if (state != null){
             state.startLayer(name, ticks);
         }
+    }
+
+    public void sendLayerMessage(String stateName, String layerName, AnimationLayerMessage message){
+        AnimationState<T> state = getState(stateName);
+        if (state != null){
+            state.sendLayerMessage(layerName, message);
+        }
+
     }
 
     public void stopLayer(String name){

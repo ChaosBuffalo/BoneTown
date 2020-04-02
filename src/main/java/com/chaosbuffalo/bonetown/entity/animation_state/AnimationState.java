@@ -4,8 +4,11 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
+import com.chaosbuffalo.bonetown.entity.animation_state.layers.IAnimationLayer;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class AnimationState<T extends Entity & IBTAnimatedEntity> {
@@ -41,6 +44,13 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity> {
         layerIndex.clear();
     }
 
+    public void sendLayerMessage(String layerName, AnimationLayerMessage message){
+        IAnimationLayer<T> layer = getLayer(layerName);
+        if (layer != null){
+            layer.receiveLayerMessage(message);
+        }
+    }
+
     public boolean isValid() {
         return skeleton != null;
     }
@@ -66,6 +76,11 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity> {
         if (layer != null){
             layer.setActive(false);
         }
+    }
+
+    @Nullable
+    public IAnimationLayer<T> getLayer(String name){
+        return layerIndex.get(name);
     }
 
     public void leaveState(){

@@ -1,9 +1,14 @@
-package com.chaosbuffalo.bonetown.entity.animation_state;
+package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import java.util.function.Consumer;
 
 
 public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> implements IAnimationLayer<T> {
@@ -14,6 +19,7 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
     private final T entity;
     private boolean autoStart;
     private final String name;
+    private final Map<String, Consumer<AnimationLayerMessage>> messageCallbacks;
 
     public AnimationLayerBase(String name, T entity){
         startTime = 0;
@@ -21,6 +27,7 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
         this.isValid = entity != null && entity.getSkeleton() != null;
         this.isActive = true;
         this.autoStart = true;
+        this.messageCallbacks = new HashMap<>();
         this.name = name;
     }
 
@@ -34,6 +41,9 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
         this.isActive = isActive;
     }
 
+    public void addMessageCallback(String messageType, Consumer<AnimationLayerMessage> consumer){
+        messageCallbacks.put(messageType, consumer);
+    }
 
     @Override
     public T getEntity() {
@@ -81,5 +91,12 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
             return;
         }
         doLayerWork(basePose, currentTime, partialTicks, outPose);
+    }
+
+    @Override
+    public void receiveLayerMessage(AnimationLayerMessage message) {
+        if (messageCallbacks.containsKey(message.getMessageType())){
+            messageCallbacks.get(message.getMessageType()).accept(message);
+        }
     }
 }
