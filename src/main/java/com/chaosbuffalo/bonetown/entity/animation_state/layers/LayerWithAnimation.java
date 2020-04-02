@@ -33,10 +33,16 @@ public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> e
         }
     }
 
-    public void consumeChangeAnimation(AnimationLayerMessage message){
+    protected void changeAnimationHandler(ChangeLayerAnimationMessage message){
+        if (message.getSlot() == 0){
+            setAnimation(message.getAnim());
+        }
+    }
+
+    private void consumeChangeAnimation(AnimationLayerMessage message){
         if (message instanceof ChangeLayerAnimationMessage){
             ChangeLayerAnimationMessage changeMessage = (ChangeLayerAnimationMessage) message;
-            setAnimation(changeMessage.getAnim());
+            changeAnimationHandler(changeMessage);
         }
     }
 

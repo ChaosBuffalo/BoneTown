@@ -38,11 +38,11 @@ public class WeightedAnimationBlend implements IPoseProvider {
     private void bake(){
         int count = 0;
         for (Matrix4d joint : basePose.getJointMatrices()){
-            Matrix4d newJoint = new Matrix4d(joint);
+            workFrame.setJointMatrix(count, joint);
+            Matrix4d newJoint = workFrame.getJointMatrix(count);
             for (AnimationWeight blend : animBlends){
                 newJoint.lerp(blend.provider.getJointMatrix(count), blend.weight);
             }
-            workFrame.setJointMatrix(count, newJoint);
             count++;
         }
     }
