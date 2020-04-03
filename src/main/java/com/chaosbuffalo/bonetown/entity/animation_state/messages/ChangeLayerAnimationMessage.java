@@ -1,7 +1,7 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.messages;
 
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LayerWithAnimation;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
 public class ChangeLayerAnimationMessage extends AnimationLayerMessage {
@@ -10,22 +10,21 @@ public class ChangeLayerAnimationMessage extends AnimationLayerMessage {
     private final ResourceLocation anim;
 
     static {
-        LayerMessageFactory.addDeseralizer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::fromNBT);
-        LayerMessageFactory.addSerializer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::toNBT);
+        LayerMessageFactory.addNetworkDeserializer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::fromPacketBuffer);
+        LayerMessageFactory.addNetworkSerializer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::toPacketBuffer);
     }
 
-    private static CompoundNBT toNBT(AnimationLayerMessage message, CompoundNBT tag){
+    private static void toPacketBuffer(AnimationLayerMessage message, PacketBuffer buffer){
         if (message instanceof ChangeLayerAnimationMessage){
             ChangeLayerAnimationMessage changeMessage = (ChangeLayerAnimationMessage) message;
-            tag.putString("slot", changeMessage.getSlot());
-            tag.putString("anim", changeMessage.getAnim().toString());
+            buffer.writeString(changeMessage.getSlot());
+            buffer.writeResourceLocation(changeMessage.getAnim());
         }
-        return tag;
     }
 
-    private static ChangeLayerAnimationMessage fromNBT(CompoundNBT tag){
-        String slot = tag.getString("slot");
-        ResourceLocation animName = new ResourceLocation(tag.getString("anim"));
+    private static ChangeLayerAnimationMessage fromPacketBuffer(PacketBuffer buffer){
+        String slot = buffer.readString();
+        ResourceLocation animName = buffer.readResourceLocation();
         return new ChangeLayerAnimationMessage(animName, slot);
     }
 
