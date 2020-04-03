@@ -21,7 +21,7 @@ public interface IAnimationLayer<T extends Entity & IBTAnimatedEntity> {
 
     boolean shouldRun();
 
-    void receiveLayerMessage(AnimationLayerMessage message);
+    void consumeLayerMessage(AnimationLayerMessage message);
 
     String getLayerName();
 

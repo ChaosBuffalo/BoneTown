@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.messages;
 
+
 public abstract class AnimationLayerMessage {
     private String messageType;
 

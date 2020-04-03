@@ -22,9 +22,12 @@ public class FullBodyPoseLayer<T extends Entity & IBTAnimatedEntity> extends Lay
 
     @Override
     void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
-        BakedAnimation.InterpolationFramesReturn ret = getAnimation().getInterpolationFrames(
-                currentTime - getStartTime(), shouldLoop, partialTicks);
-        weightedBlend.simpleBlend(ret.current, ret.next, ret.partialTick);
-        outPose.copyPose(weightedBlend.getPose());
+        BakedAnimation animation = getAnimation(BASE_SLOT);
+        if (animation != null){
+            BakedAnimation.InterpolationFramesReturn ret = animation.getInterpolationFrames(
+                    currentTime - getStartTime(), shouldLoop, partialTicks);
+            weightedBlend.simpleBlend(ret.current, ret.next, ret.partialTick);
+            outPose.copyPose(weightedBlend.getPose());
+        }
     }
 }

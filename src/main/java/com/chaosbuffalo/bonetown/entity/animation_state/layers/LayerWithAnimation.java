@@ -10,23 +10,28 @@ import com.chaosbuffalo.bonetown.entity.animation_state.messages.ChangeLayerAnim
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> extends AnimationLayerBase<T> {
-    private BakedAnimation animation;
+    public static final String BASE_SLOT = "BASE";
+
+    private final Map<String, BakedAnimation> slots;
 
     public LayerWithAnimation(String name, ResourceLocation animName, T entity){
         super(name, entity);
-        setAnimation(animName);
+        slots = new HashMap<>();
+        setAnimation(animName, BASE_SLOT);
         addMessageCallback(ChangeLayerAnimationMessage.CHANGE_ANIMATION_TYPE, this::consumeChangeAnimation);
     }
 
-    private void setAnimation(ResourceLocation anim){
+    private void setAnimation(ResourceLocation anim, String slotName){
         BoneMFSkeleton skeleton = getEntity().getSkeleton();
         if (skeleton != null){
-            animation = skeleton.getBakedAnimation(anim);
-            if (animation != null){
-                this.isValid = true;
-            } else {
-                this.isValid = false;
+            BakedAnimation animation = skeleton.getBakedAnimation(anim);
+            slots.put(slotName, animation);
+            if (animation == null){
                 BoneTown.LOGGER.error("Animation {} not found for entity: {}",
                         anim.toString(), getEntity().toString());
             }
@@ -34,9 +39,7 @@ public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> e
     }
 
     protected void changeAnimationHandler(ChangeLayerAnimationMessage message){
-        if (message.getSlot() == 0){
-            setAnimation(message.getAnim());
-        }
+        setAnimation(message.getAnim(), message.getSlot());
     }
 
     private void consumeChangeAnimation(AnimationLayerMessage message){
@@ -46,7 +49,8 @@ public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> e
         }
     }
 
-    public BakedAnimation getAnimation() {
-        return animation;
+    @Nullable
+    public BakedAnimation getAnimation(String slotName) {
+        return slots.get(slotName);
     }
 }

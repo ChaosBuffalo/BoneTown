@@ -94,7 +94,7 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
     }
 
     @Override
-    public void receiveLayerMessage(AnimationLayerMessage message) {
+    public void consumeLayerMessage(AnimationLayerMessage message) {
         if (messageCallbacks.containsKey(message.getMessageType())){
             messageCallbacks.get(message.getMessageType()).accept(message);
         }

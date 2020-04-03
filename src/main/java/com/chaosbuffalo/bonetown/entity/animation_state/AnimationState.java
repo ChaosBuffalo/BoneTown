@@ -44,10 +44,10 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity> {
         layerIndex.clear();
     }
 
-    public void sendLayerMessage(String layerName, AnimationLayerMessage message){
+    public void consumeLayerMessage(String layerName, AnimationLayerMessage message){
         IAnimationLayer<T> layer = getLayer(layerName);
         if (layer != null){
-            layer.receiveLayerMessage(message);
+            layer.consumeLayerMessage(message);
         }
     }
 

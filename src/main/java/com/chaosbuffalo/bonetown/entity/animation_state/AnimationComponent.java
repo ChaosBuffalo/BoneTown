@@ -50,10 +50,10 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         }
     }
 
-    public void sendLayerMessage(String stateName, String layerName, AnimationLayerMessage message){
+    public void distrubeLayerMessage(String stateName, String layerName, AnimationLayerMessage message){
         AnimationState<T> state = getState(stateName);
         if (state != null){
-            state.sendLayerMessage(layerName, message);
+            state.consumeLayerMessage(layerName, message);
         }
 
     }
