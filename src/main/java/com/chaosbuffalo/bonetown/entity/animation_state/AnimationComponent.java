@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements INBTSerializable<CompoundNBT> {
+public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> implements INBTSerializable<CompoundNBT> {
 
     private final T entity;
     private int ticks;
@@ -34,9 +34,9 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
 
     private final List<AnimationMessage> syncQueue;
 
-    private static final Map<String, BiConsumer<AnimationComponent, AnimationMessage>> messageHandlers = new HashMap<>();
+    private static final Map<String, BiConsumer<AnimationComponent<?>, AnimationMessage>> messageHandlers = new HashMap<>();
 
-    public static void addMessageHandler(String messageType, BiConsumer<AnimationComponent, AnimationMessage> handler){
+    public static void addMessageHandler(String messageType, BiConsumer<AnimationComponent<?>, AnimationMessage> handler){
         messageHandlers.put(messageType, handler);
     }
 
