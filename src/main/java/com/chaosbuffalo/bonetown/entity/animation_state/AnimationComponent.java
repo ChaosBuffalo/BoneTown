@@ -4,13 +4,15 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
-import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements INBTSerializable<CompoundNBT> {
 
@@ -24,6 +26,11 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
     private String currentState;
     public static final String INVALID_STATE = "invalid";
 
+    private static final Map<String, BiConsumer<AnimationComponent, AnimationMessage>> messageHandlers = new HashMap<>();
+
+    public static void addMessageHandler(String messageType, BiConsumer<AnimationComponent, AnimationMessage> handler){
+        messageHandlers.put(messageType, handler);
+    }
 
     public AnimationComponent(T entity){
         this.entity = entity;
@@ -43,23 +50,32 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
         animationStates.remove(name);
     }
 
-    public void startLayer(String name){
-        AnimationState<T> state = getState(getCurrentState());
+    public void startLayer(String stateName, String name){
+        AnimationState<T> state = getState(stateName);
         if (state != null){
             state.startLayer(name, ticks);
         }
     }
 
-    public void distrubeLayerMessage(String stateName, String layerName, AnimationLayerMessage message){
+    public void distributeLayerMessage(String stateName, String layerName, AnimationLayerMessage message){
         AnimationState<T> state = getState(stateName);
         if (state != null){
             state.consumeLayerMessage(layerName, message);
         }
+    }
+
+    public void handleMessage(AnimationMessage message){
+        if (messageHandlers.containsKey(message.getType())){
+            messageHandlers.get(message.getType()).accept(this, message);
+        } else {
+            BoneTown.LOGGER.warn("AnimationMessage type {} not handled by {}", message.getType(),
+                    getEntity().toString());
+        }
 
     }
 
-    public void stopLayer(String name){
-        AnimationState<T> state = getState(getCurrentState());
+    public void stopLayer(String stateName, String name){
+        AnimationState<T> state = getState(stateName);
         if (state != null){
             state.stopLayer(name);
         }

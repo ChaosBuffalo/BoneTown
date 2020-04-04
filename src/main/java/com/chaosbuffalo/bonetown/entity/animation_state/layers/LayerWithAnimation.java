@@ -5,8 +5,8 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
-import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationLayerMessage;
-import com.chaosbuffalo.bonetown.entity.animation_state.messages.ChangeLayerAnimationMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.ChangeLayerAnimationMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 

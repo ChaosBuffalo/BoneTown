@@ -1,6 +1,7 @@
-package com.chaosbuffalo.bonetown.entity.animation_state.messages;
+package com.chaosbuffalo.bonetown.entity.animation_state.messages.layer;
 
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LayerWithAnimation;
+import com.chaosbuffalo.bonetown.network.NetworkDeserializers;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
@@ -10,16 +11,15 @@ public class ChangeLayerAnimationMessage extends AnimationLayerMessage {
     private final ResourceLocation anim;
 
     static {
-        LayerMessageFactory.addNetworkDeserializer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::fromPacketBuffer);
-        LayerMessageFactory.addNetworkSerializer(CHANGE_ANIMATION_TYPE, ChangeLayerAnimationMessage::toPacketBuffer);
+        NetworkDeserializers.layerMessageDeserializer.addNetworkDeserializer(CHANGE_ANIMATION_TYPE,
+                ChangeLayerAnimationMessage::fromPacketBuffer);
     }
 
-    private static void toPacketBuffer(AnimationLayerMessage message, PacketBuffer buffer){
-        if (message instanceof ChangeLayerAnimationMessage){
-            ChangeLayerAnimationMessage changeMessage = (ChangeLayerAnimationMessage) message;
-            buffer.writeString(changeMessage.getSlot());
-            buffer.writeResourceLocation(changeMessage.getAnim());
-        }
+    @Override
+    public void toPacketBuffer(PacketBuffer buffer){
+        super.toPacketBuffer(buffer);
+        buffer.writeString(getSlot());
+        buffer.writeResourceLocation(getAnim());
     }
 
     private static ChangeLayerAnimationMessage fromPacketBuffer(PacketBuffer buffer){
