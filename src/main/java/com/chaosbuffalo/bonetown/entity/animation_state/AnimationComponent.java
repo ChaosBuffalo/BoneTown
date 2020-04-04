@@ -6,8 +6,13 @@ import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationMessage;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
+import com.chaosbuffalo.bonetown.network.EntityAnimationClientUpdatePacket;
+import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
@@ -25,6 +30,9 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
     private float lastPartialTicks;
     private String currentState;
     public static final String INVALID_STATE = "invalid";
+    private static final double SYNC_RANGE = 50.0 * 50.0;
+
+    private final List<AnimationMessage> syncQueue;
 
     private static final Map<String, BiConsumer<AnimationComponent, AnimationMessage>> messageHandlers = new HashMap<>();
 
@@ -35,6 +43,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
     public AnimationComponent(T entity){
         this.entity = entity;
         ticks = 0;
+        this.syncQueue = new ArrayList<>();
         animationStates = new HashMap<>();
         workFrame = new AnimationFrame();
         lastPoseFetch = -1;
@@ -65,6 +74,9 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
     }
 
     public void handleMessage(AnimationMessage message){
+        if (!getEntity().world.isRemote()){
+            syncQueue.add(message);
+        }
         if (messageHandlers.containsKey(message.getType())){
             messageHandlers.get(message.getType()).accept(this, message);
         } else {
@@ -150,10 +162,19 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity> implements
 
     public void update() {
         ticks++;
-    }
-
-    public void setCurrentTicks(int ticks){
-        this.ticks = ticks;
+        World world = getEntity().getEntityWorld();
+        if (!world.isRemote()){
+            if (syncQueue.size() > 0){
+                EntityAnimationClientUpdatePacket packet = new EntityAnimationClientUpdatePacket(getEntity(),
+                        syncQueue.toArray(new AnimationMessage[0]));
+                for (PlayerEntity player : world.getPlayers()){
+                    if (getEntity().getDistanceSq(player) <= SYNC_RANGE){
+                        PacketHandler.sendAnimationUpdate((ServerPlayerEntity) player, packet);
+                    }
+                }
+                syncQueue.clear();
+            }
+        }
     }
 
     @Override

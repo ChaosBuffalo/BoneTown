@@ -9,6 +9,7 @@ import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
 import com.chaosbuffalo.bonetown.core.proxy.IBTProxy;
 import com.chaosbuffalo.bonetown.core.proxy.ServerProxy;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
+import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -58,7 +59,7 @@ public class BoneTown
 
     private void setup(final FMLCommonSetupEvent event)
     {
-
+        PacketHandler.setupHandler();
         BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
         BoneTownRegistry.ADDITIONAL_ANIMATION_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
         BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().getModel().getSkeleton()

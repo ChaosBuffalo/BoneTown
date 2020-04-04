@@ -1,6 +1,7 @@
 package com.chaosbuffalo.bonetown.network;
 
 
+import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationMessage;
@@ -31,6 +32,11 @@ public class EntityAnimationClientUpdatePacket {
         messages = new ArrayList<>();
         for (int i=0; i < count; i++){
             AnimationMessage message = NetworkDeserializers.animationMessageDeserializer.deserialize(buffer);
+            if (message == null){
+                BoneTown.LOGGER.error("Error decoding EntityAnimationClientUpdatePacket for Entity: {}",
+                        entityId);
+                break;
+            }
             messages.add(message);
         }
     }
