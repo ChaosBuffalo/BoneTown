@@ -5,7 +5,6 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationMessage;
-import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
@@ -60,7 +59,7 @@ public class EntityAnimationClientUpdatePacket {
             if (entity instanceof IBTAnimatedEntity){
                 AnimationComponent<?> component = ((IBTAnimatedEntity<?>) entity).getAnimationComponent();
                 for (AnimationMessage message : messages){
-                    component.handleMessage(message);
+                    component.updateState(message);
                 }
             }
         });

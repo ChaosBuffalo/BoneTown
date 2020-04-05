@@ -2,6 +2,7 @@ package com.chaosbuffalo.bonetown.entity.animation_state;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
+import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.IAnimationLayer;
@@ -11,7 +12,7 @@ import net.minecraft.entity.Entity;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class AnimationState<T extends Entity & IBTAnimatedEntity> {
+public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
 
     private final List<IAnimationLayer<T>> layers;
     private final Map<String, IAnimationLayer<T>> layerIndex;
@@ -98,7 +99,7 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity> {
         }
     }
 
-    public void applyToPose(int currentTicks, float partialTicks, AnimationFrame workFrame){
+    public void applyToPose(int currentTicks, float partialTicks, IPose workFrame){
         if (isValid()){
             for (IAnimationLayer<T> layer : layers) {
                 layer.processLayer(skeleton.getBindPose(), currentTicks, partialTicks, workFrame);

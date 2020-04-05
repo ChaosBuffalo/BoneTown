@@ -3,6 +3,7 @@ package com.chaosbuffalo.bonetown.entity.animation_state;
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
+import com.chaosbuffalo.bonetown.core.animation.Pose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.AnimationMessage;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
@@ -24,8 +25,8 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     private final T entity;
     private int ticks;
     private final Map<String, AnimationState<T>> animationStates;
-    private final AnimationFrame workFrame;
-    private static final AnimationFrame DEFAULT_FRAME = new AnimationFrame();
+    private final Pose workFrame;
+    private static final Pose DEFAULT_FRAME = new Pose();
     private int lastPoseFetch;
     private float lastPartialTicks;
     private String currentState;
@@ -45,7 +46,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         ticks = 0;
         this.syncQueue = new ArrayList<>();
         animationStates = new HashMap<>();
-        workFrame = new AnimationFrame();
+        workFrame = new Pose();
         lastPoseFetch = -1;
         lastPartialTicks = 0;
         currentState = INVALID_STATE;
@@ -73,7 +74,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         }
     }
 
-    public void handleMessage(AnimationMessage message){
+    public void updateState(AnimationMessage message){
         if (!getEntity().world.isRemote()){
             syncQueue.add(message);
         }

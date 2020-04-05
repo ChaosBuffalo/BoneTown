@@ -8,7 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
 
-public class FullBodyPoseLayer<T extends Entity & IBTAnimatedEntity> extends LayerWithAnimation<T> {
+public class FullBodyPoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends LayerWithAnimation<T> {
 
     private boolean shouldLoop;
     private final WeightedAnimationBlend weightedBlend;

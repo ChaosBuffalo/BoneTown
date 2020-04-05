@@ -10,11 +10,11 @@ public class WeightedAnimationBlend implements IPoseProvider {
 
     private final List<AnimationWeight> animBlends;
     private IPose basePose;
-    private final AnimationFrame workFrame;
+    private final Pose workFrame;
 
 
     public WeightedAnimationBlend(){
-        workFrame = new AnimationFrame();
+        workFrame = new Pose();
         animBlends = new ArrayList<>();
     }
 

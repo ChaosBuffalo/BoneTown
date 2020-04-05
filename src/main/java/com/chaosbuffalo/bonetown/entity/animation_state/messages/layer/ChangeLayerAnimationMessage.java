@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class ChangeLayerAnimationMessage extends AnimationLayerMessage {
     public static String CHANGE_ANIMATION_TYPE = "CHANGE_ANIMATION_TYPE";
-    private String slot;
+    private final String slot;
     private final ResourceLocation anim;
 
     static {

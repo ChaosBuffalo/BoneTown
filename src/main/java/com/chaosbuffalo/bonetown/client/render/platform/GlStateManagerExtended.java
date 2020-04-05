@@ -42,8 +42,4 @@ public class GlStateManagerExtended extends GlStateManager {
         GL11.glDrawElements(mode, count, type, indices);
     }
 
-    public static void glUniformMatrix4fv(int location, int count, boolean transpose, FloatBuffer buffer){
-        RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-    }
-
 }

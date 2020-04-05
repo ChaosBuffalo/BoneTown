@@ -5,7 +5,7 @@ import org.joml.Matrix4d;
 
 import java.util.Arrays;
 
-public class AnimationFrame implements IPose {
+public class AnimationFrame extends Pose {
 
     public static final int MAX_JOINTS = 150;
 
@@ -15,28 +15,23 @@ public class AnimationFrame implements IPose {
         Arrays.fill(DEFAULT_FRAME, new Matrix4d());
     }
 
-    private final Matrix4d[] jointMatrices;
+    private final Matrix4d[] localJointMatrices;
 
     public AnimationFrame() {
-        jointMatrices = new Matrix4d[MAX_JOINTS];
+        super();
+        localJointMatrices = new Matrix4d[MAX_JOINTS];
         for (int i = 0; i < MAX_JOINTS; i++){
-            jointMatrices[i] = new Matrix4d();
+            localJointMatrices[i] = new Matrix4d();
         }
     }
 
-    @Override
-    public Matrix4d[] getJointMatrices() {
-        return jointMatrices;
+    public void setLocalJointMatrix(int index, Matrix4d mat){
+        localJointMatrices[index].set(mat);
     }
 
-    @Override
-    public Matrix4d getJointMatrix(int index) {
-        return jointMatrices[index];
+    public Matrix4d getLocalJointMatrix(int index){
+        return localJointMatrices[index];
     }
 
-    @Override
-    public void setJointMatrix(int index, Matrix4d mat) {
-        jointMatrices[index].set(mat);
-    }
 
 }

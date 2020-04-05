@@ -5,13 +5,15 @@ import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.util.function.Consumer;
 
 
-public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> implements IAnimationLayer<T> {
+public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity<T>> implements IAnimationLayer<T> {
 
     private int startTime;
     protected boolean isValid;
@@ -44,6 +46,7 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity> i
     public void addMessageCallback(String messageType, Consumer<AnimationLayerMessage> consumer){
         messageCallbacks.put(messageType, consumer);
     }
+
 
     @Override
     public T getEntity() {

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class BakedAnimation {
 
-    private List<IPose> frames;
+    private List<AnimationFrame> frames;
 
     private ResourceLocation name;
 
@@ -15,14 +15,14 @@ public class BakedAnimation {
 
     private int frameCount;
 
-    public class InterpolationFramesReturn {
+    public static class InterpolationFramesReturn {
 
-        public IPose current;
-        public IPose next;
+        public AnimationFrame current;
+        public AnimationFrame next;
         public float partialTick;
 
-        public InterpolationFramesReturn(IPose current,
-                                         IPose next,
+        public InterpolationFramesReturn(AnimationFrame current,
+                                         AnimationFrame next,
                                          float partialTick){
             this.current = current;
             this.next = next;
@@ -30,7 +30,7 @@ public class BakedAnimation {
         }
     }
 
-    public BakedAnimation(ResourceLocation name, List<IPose> frames, double ticksPerSecond) {
+    public BakedAnimation(ResourceLocation name, List<AnimationFrame> frames, double ticksPerSecond) {
         this.name = name;
         this.frames = frames;
         this.frameCount = frames.size();
@@ -42,12 +42,12 @@ public class BakedAnimation {
         return (double) getFrameCount() / getTicksPerSecond();
     }
 
-    public List<IPose> getFrames() {
+    public List<AnimationFrame> getFrames() {
         return frames;
     }
 
 
-    public IPose getFrame(int index){
+    public AnimationFrame getFrame(int index){
         return this.frames.get(index);
     }
 

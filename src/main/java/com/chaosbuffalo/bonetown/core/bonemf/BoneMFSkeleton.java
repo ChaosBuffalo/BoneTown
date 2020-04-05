@@ -3,7 +3,6 @@ package com.chaosbuffalo.bonetown.core.bonemf;
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
-import com.chaosbuffalo.bonetown.core.animation.IPose;
 import net.minecraft.util.ResourceLocation;
 import org.joml.Matrix4d;
 import javax.annotation.Nullable;
@@ -93,7 +92,7 @@ public class BoneMFSkeleton {
         if (animation == null){
             return null;
         }
-        List<IPose> frames = new ArrayList<>();
+        List<AnimationFrame> frames = new ArrayList<>();
         for (long i = 0; i < animation.getFrameCount(); i++){
             frames.add(new AnimationFrame());
         }
@@ -104,10 +103,11 @@ public class BoneMFSkeleton {
             if (channel != null){
                 int frameCount = 0;
                 for (BoneMFNodeFrame nodeFrame : channel.getFrames()){
-                    AnimationFrame frame = (AnimationFrame) frames.get(frameCount);
+                    AnimationFrame frame = frames.get(frameCount);
                     Matrix4d parentTransform;
                     Matrix4d frameTransform = bone.calculateLocalTransform(nodeFrame.getTranslation(),
                             nodeFrame.getRotation(), nodeFrame.getScale());
+                    frame.setLocalJointMatrix(index, frameTransform);
                     if (parentIndex != -1){
                         parentTransform = new Matrix4d(frame.getJointMatrix(parentIndex));
                     } else {

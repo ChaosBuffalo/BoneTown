@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> extends AnimationLayerBase<T> {
+public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity<T>> extends AnimationLayerBase<T> {
     public static final String BASE_SLOT = "BASE";
 
     private final Map<String, BakedAnimation> slots;
@@ -26,7 +26,7 @@ public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity> e
         addMessageCallback(ChangeLayerAnimationMessage.CHANGE_ANIMATION_TYPE, this::consumeChangeAnimation);
     }
 
-    private void setAnimation(ResourceLocation anim, String slotName){
+    public void setAnimation(ResourceLocation anim, String slotName){
         BoneMFSkeleton skeleton = getEntity().getSkeleton();
         if (skeleton != null){
             BakedAnimation animation = skeleton.getBakedAnimation(anim);

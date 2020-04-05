@@ -10,7 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4d;
 import org.joml.Vector4d;
 
-public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity> extends AnimationLayerBase<T> {
+public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity<T>> extends AnimationLayerBase<T> {
 
     private final String boneName;
 
@@ -27,7 +27,9 @@ public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity> exten
     @Override
     public void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
         BoneMFSkeleton skeleton = getEntity().getSkeleton();
-        // Would only be called if we are isValid(), null check is performed
+        if (skeleton == null){
+            return;
+        }
         BoneMFNode bone = skeleton.getBone(getBoneName());
         T entity = getEntity();
         if (bone != null) {
