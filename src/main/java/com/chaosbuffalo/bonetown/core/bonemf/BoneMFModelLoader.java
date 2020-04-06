@@ -186,9 +186,7 @@ public class BoneMFModelLoader {
             for (CBORObject key : animationsCbor.getKeys()){
                 String animationName = key.AsString();
                 CBORObject animationCbor = animationsCbor.get(animationName);
-                ResourceLocation newName = new ResourceLocation(name.getNamespace(),
-                        name.getPath() + "." + animationName);
-                skeleton.addAnimation(newName, parseAnimation(animationName, animationCbor));
+                skeleton.addAnimation(name, parseAnimation(animationName, animationCbor));
             }
         });
     }

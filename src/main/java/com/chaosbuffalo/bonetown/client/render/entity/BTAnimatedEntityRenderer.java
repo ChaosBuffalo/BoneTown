@@ -9,12 +9,14 @@ import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.MathHelper;
 
 
-
-public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEntity> extends BTEntityRenderer<T> {
+public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEntity<T>> extends BTEntityRenderer<T> {
     private BTAnimatedModel animatedModel;
 
     protected BTAnimatedEntityRenderer(EntityRendererManager renderManager, BTAnimatedModel model) {
@@ -27,11 +29,17 @@ public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEnt
         return animatedModel;
     }
 
+    public void handleEntityOrientation(MatrixStack matrixStackIn, T entity, float partialTicks){
+
+    }
+
     @Override
     public void drawModel(RenderType renderType, T entityIn, float entityYaw,
                           float partialTicks, MatrixStack matrixStackIn,
                           Matrix4f projectionMatrix, int packedLightIn,
                           int packedOverlay, IBTShaderProgram program) {
+        matrixStackIn.push();
+        handleEntityOrientation(matrixStackIn, entityIn, partialTicks);
         program.initRender(renderType, matrixStackIn, projectionMatrix, packedLightIn, packedOverlay);
         IPose pose = entityIn.getAnimationComponent().getCurrentPose(partialTicks);
         BoneMFSkeleton skeleton = entityIn.getSkeleton();
@@ -44,5 +52,6 @@ public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEnt
         program.uploadAnimationFrame(pose.getJointMatrices());
         modelRenderData.render();
         program.endRender(renderType);
+        matrixStackIn.pop();
     }
 }

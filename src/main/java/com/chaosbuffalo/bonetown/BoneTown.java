@@ -3,6 +3,7 @@ package com.chaosbuffalo.bonetown;
 import com.chaosbuffalo.bonetown.client.render.entity.DebugBoneRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestAnimatedRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
+import com.chaosbuffalo.bonetown.client.render.entity.TestZombieRenderer;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
@@ -78,6 +79,10 @@ public class BoneTown
         RenderingRegistry.registerEntityRenderingHandler(
                 BTEntityTypes.DEBUG_BONE_ENTITY.get(),
                 DebugBoneRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                BTEntityTypes.TEST_ZOMBIE.get(),
+                TestZombieRenderer::new
+        );
         LOGGER.debug("Registered Entity Renderers");
 
     }

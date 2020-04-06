@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
+import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.animation.WeightedAnimationBlend;
@@ -45,6 +46,8 @@ public class BlendTwoPoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends 
     void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
         BakedAnimation baseAnimation = getAnimation(BASE_SLOT);
         BakedAnimation blendAnimation = getAnimation(SECOND_SLOT);
+        BoneTown.LOGGER.info("Zombie walk blend amount: {}, time: {}", getBlendAmount(),
+                currentTime - getStartTime());
         if (baseAnimation != null && blendAnimation != null){
             BakedAnimation.InterpolationFramesReturn ret = baseAnimation.getInterpolationFrames(
                     currentTime - getStartTime(), shouldLoop, partialTicks);

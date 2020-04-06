@@ -14,12 +14,12 @@ public class BTAnimations {
     @SubscribeEvent
     public static void registerAnimationData(RegistryEvent.Register<BTAdditionalAnimationEntry> event){
 
-//        event.getRegistry().register(new BTAdditionalAnimationEntry(
-//                new ResourceLocation(BoneTown.MODID, "biped.idle"),
-//                new ResourceLocation(BoneTown.MODID, "biped"),
-//                new ResourceLocation(BoneTown.MODID, "biped_idle")));
         event.getRegistry().register(new BTAdditionalAnimationEntry(
+                new ResourceLocation(BoneTown.MODID, "biped.idle"),
                 new ResourceLocation(BoneTown.MODID, "biped"),
+                new ResourceLocation(BoneTown.MODID, "biped_idle")));
+        event.getRegistry().register(new BTAdditionalAnimationEntry(
+                new ResourceLocation(BoneTown.MODID, "biped.running"),
                 new ResourceLocation(BoneTown.MODID, "biped"),
                 new ResourceLocation(BoneTown.MODID, "biped_running")));
 //        event.getRegistry().register(new BTAdditionalAnimationEntry(

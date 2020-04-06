@@ -1,8 +1,6 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
-import net.minecraft.client.renderer.entity.BipedRenderer;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 
