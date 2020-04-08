@@ -3,7 +3,7 @@ package com.chaosbuffalo.bonetown.core.model;
 import com.chaosbuffalo.bonetown.core.BoneTownConstants;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModel;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModelLoader;
-import com.chaosbuffalo.bonetown.init.BTShaders;
+import com.chaosbuffalo.bonetown.init.BTMaterials;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -25,7 +25,7 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
     private BakedMesh[] meshes;
 
     public BTModel(ResourceLocation name, BoneTownConstants.MeshTypes meshType){
-        this(name, BTShaders.DEFAULT_STATIC_LOC, meshType);
+        this(name, BTMaterials.DEFAULT_STATIC_LOC, meshType);
     }
 
 

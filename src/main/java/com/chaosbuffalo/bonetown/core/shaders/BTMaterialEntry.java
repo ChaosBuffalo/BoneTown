@@ -6,13 +6,13 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
-public class BTShaderProgramEntry implements IForgeRegistryEntry<BTShaderProgramEntry> {
+public class BTMaterialEntry implements IForgeRegistryEntry<BTMaterialEntry> {
     private ResourceLocation location;
     private ResourceLocation vertexShader;
     private ResourceLocation fragShader;
 
-    public BTShaderProgramEntry(ResourceLocation name, ResourceLocation vertexShader,
-                                ResourceLocation fragShader){
+    public BTMaterialEntry(ResourceLocation name, ResourceLocation vertexShader,
+                           ResourceLocation fragShader){
         setRegistryName(name);
         this.vertexShader = vertexShader;
         this.fragShader = fragShader;
@@ -27,13 +27,13 @@ public class BTShaderProgramEntry implements IForgeRegistryEntry<BTShaderProgram
     }
 
     @Override
-    public BTShaderProgramEntry setRegistryName(ResourceLocation name) {
+    public BTMaterialEntry setRegistryName(ResourceLocation name) {
         location = name;
         return this;
     }
 
-    public IBTShaderProgram getProgram(int programId, ShaderLoader vertex, ShaderLoader frag){
-        return new BTShaderProgram(programId, vertex, frag);
+    public IBTMaterial getProgram(int programId, ShaderLoader vertex, ShaderLoader frag){
+        return new BTMaterial(programId, vertex, frag);
     }
 
     @Nullable
@@ -43,7 +43,7 @@ public class BTShaderProgramEntry implements IForgeRegistryEntry<BTShaderProgram
     }
 
     @Override
-    public Class<BTShaderProgramEntry> getRegistryType() {
-        return BTShaderProgramEntry.class;
+    public Class<BTMaterialEntry> getRegistryType() {
+        return BTMaterialEntry.class;
     }
 }

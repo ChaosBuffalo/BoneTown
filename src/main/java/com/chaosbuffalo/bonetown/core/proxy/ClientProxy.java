@@ -1,7 +1,7 @@
 package com.chaosbuffalo.bonetown.core.proxy;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;
+import com.chaosbuffalo.bonetown.core.shaders.MaterialResourceManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IReloadableResourceManager;
 
@@ -12,6 +12,6 @@ public class ClientProxy extends CommonProxy {
         super.registerHandlers();
         BoneTown.LOGGER.info("Registering client handlers");
         ((IReloadableResourceManager) Minecraft.getInstance().getResourceManager())
-                .addReloadListener(BTShaderResourceManager.INSTANCE);
+                .addReloadListener(MaterialResourceManager.INSTANCE);
     }
 }

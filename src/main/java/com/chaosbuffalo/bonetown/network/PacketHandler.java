@@ -22,9 +22,6 @@ public class PacketHandler {
         return networkChannel;
     }
 
-    public static void sendAnimationUpdate(ServerPlayerEntity player, EntityAnimationClientUpdatePacket packet){
-        networkChannel.sendTo(packet, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-    }
 
     public static void registerMessages(SimpleChannel channel){
         channel.registerMessage(1, EntityAnimationClientUpdatePacket.class,

@@ -4,7 +4,7 @@ import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.BoneTownConstants;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFModelLoader;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
-import com.chaosbuffalo.bonetown.init.BTShaders;
+import com.chaosbuffalo.bonetown.init.BTMaterials;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
@@ -26,7 +26,7 @@ public class BTAnimatedModel extends BTModel {
     }
 
     public BTAnimatedModel(ResourceLocation name, BoneTownConstants.MeshTypes meshType){
-        this(name, BTShaders.DEFAULT_ANIMATED_LOC, meshType);
+        this(name, BTMaterials.DEFAULT_ANIMATED_LOC, meshType);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.chaosbuffalo.bonetown.entity.animation_state;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.animation.Pose;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
@@ -10,11 +9,11 @@ import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.Animation
 import com.chaosbuffalo.bonetown.network.EntityAnimationClientUpdatePacket;
 import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -47,6 +46,9 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         this.syncQueue = new ArrayList<>();
         animationStates = new HashMap<>();
         workFrame = new Pose();
+        if (entity.getSkeleton() != null){
+            workFrame.setJointCount(entity.getSkeleton().getBones().size());
+        }
         lastPoseFetch = -1;
         lastPartialTicks = 0;
         currentState = INVALID_STATE;
@@ -168,11 +170,8 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
             if (syncQueue.size() > 0){
                 EntityAnimationClientUpdatePacket packet = new EntityAnimationClientUpdatePacket(getEntity(),
                         syncQueue.toArray(new AnimationMessage[0]));
-                for (PlayerEntity player : world.getPlayers()){
-                    if (getEntity().getDistanceSq(player) <= SYNC_RANGE){
-                        PacketHandler.sendAnimationUpdate((ServerPlayerEntity) player, packet);
-                    }
-                }
+                PacketDistributor.TRACKING_ENTITY.with(this::getEntity).send(PacketHandler.getNetworkChannel()
+                        .toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
                 syncQueue.clear();
             }
         }

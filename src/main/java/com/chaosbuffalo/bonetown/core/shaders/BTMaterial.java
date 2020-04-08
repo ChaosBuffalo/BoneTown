@@ -2,58 +2,58 @@ package com.chaosbuffalo.bonetown.core.shaders;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.client.render.GlobalRenderInfo;
+import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.shader.ShaderLinkHelper;
 import net.minecraft.client.shader.ShaderLoader;
-import org.joml.Matrix4d;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class BTShaderProgram implements IBTShaderProgram {
+public class BTMaterial implements IBTMaterial {
     protected final int program;
     protected final ShaderLoader vert;
     protected final ShaderLoader frag;
     protected boolean firstUpload;
     protected final static int DIFFUSE_COUNT = 2;
-    public BTShaderUniform projUniform;
-    public BTShaderUniform modelViewUniform;
-    public BTShaderUniform lightMapUV;
-    public BTShaderUniform overlayUV;
-    public BTShaderUniform ambientLight;
-    public BTShaderUniform diffuseColors;
-    public BTShaderUniform diffuseLocs;
-    protected final List<BTShaderUniform> uniforms = new ArrayList<>();
+    public MaterialUniform projUniform;
+    public MaterialUniform modelViewUniform;
+    public MaterialUniform lightMapUV;
+    public MaterialUniform overlayUV;
+    public MaterialUniform ambientLight;
+    public MaterialUniform diffuseColors;
+    public MaterialUniform diffuseLocs;
+    protected final List<MaterialUniform> uniforms = new ArrayList<>();
 
-    public BTShaderProgram(int program, ShaderLoader vert, ShaderLoader frag) {
+    public BTMaterial(int program, ShaderLoader vert, ShaderLoader frag) {
         this.program = program;
         this.vert = vert;
         this.frag = frag;
         this.firstUpload = true;
-        modelViewUniform = new BTShaderUniform("model_view",
-                BTShaderUniform.UniformType.mat4x4, this);
+        modelViewUniform = new MaterialUniform("model_view",
+                MaterialUniform.UniformType.mat4x4, this);
         uniforms.add(modelViewUniform);
-        projUniform = new BTShaderUniform("proj_mat",
-                BTShaderUniform.UniformType.mat4x4, this);
+        projUniform = new MaterialUniform("proj_mat",
+                MaterialUniform.UniformType.mat4x4, this);
         uniforms.add(projUniform);
-        lightMapUV = new BTShaderUniform("lightmap_uv",
-                BTShaderUniform.UniformType.vec2f, this);
+        lightMapUV = new MaterialUniform("lightmap_uv",
+                MaterialUniform.UniformType.vec2f, this);
         uniforms.add(lightMapUV);
-        overlayUV = new BTShaderUniform("overlay_uv",
-                BTShaderUniform.UniformType.vec2f, this);
+        overlayUV = new MaterialUniform("overlay_uv",
+                MaterialUniform.UniformType.vec2f, this);
         uniforms.add(overlayUV);
-        ambientLight = new BTShaderUniform("ambient_light",
-                BTShaderUniform.UniformType.vec3f,this);
+        ambientLight = new MaterialUniform("ambient_light",
+                MaterialUniform.UniformType.vec3f,this);
         uniforms.add(ambientLight);
-        diffuseColors = new BTShaderUniform("diffuse_colors",
-                BTShaderUniform.UniformType.vec3f, DIFFUSE_COUNT, this);
+        diffuseColors = new MaterialUniform("diffuse_colors",
+                MaterialUniform.UniformType.vec3f, DIFFUSE_COUNT, this);
         uniforms.add(diffuseColors);
-        diffuseLocs = new BTShaderUniform("diffuse_locs",
-                BTShaderUniform.UniformType.vec3f, DIFFUSE_COUNT, this);
+        diffuseLocs = new MaterialUniform("diffuse_locs",
+                MaterialUniform.UniformType.vec3f, DIFFUSE_COUNT, this);
         uniforms.add(diffuseLocs);
 
     }
@@ -101,19 +101,19 @@ public class BTShaderProgram implements IBTShaderProgram {
 
     @Override
     public void setupUniforms(){
-        for (BTShaderUniform uniform : uniforms){
+        for (MaterialUniform uniform : uniforms){
             uniform.bindUniform(program);
         }
     }
 
     @Override
-    public void uploadAnimationFrame(Matrix4d[] joints) {
+    public void uploadAnimationFrame(IPose pose) {
         BoneTown.LOGGER.warn("BTShaderProgram does not support animation, skipping uploadAnimationFrame. " +
                 "Use AnimatedShaderProgram instead.");
     }
 
     @Override
-    public void uploadInverseBindPose(Matrix4d[] bindPose) {
+    public void uploadInverseBindPose(IPose pose) {
         BoneTown.LOGGER.warn("BTShaderProgram does not support animation, skipping uploadInverseBindPose. " +
                 "Use AnimatedShaderProgram instead.");
     }
@@ -138,14 +138,11 @@ public class BTShaderProgram implements IBTShaderProgram {
     }
 
     public void uploadPackedLightMap(int packedLightmap){
-//        BoneTown.LOGGER.info("lightmap coords: {}, {}", (packedLightmap & 0xFFFF) /256.0f,(packedLightmap >>> 16) / 256.0f );
         lightMapUV.set(((packedLightmap & 0xFFFF) / 256.0f) + 0.03125f, ((packedLightmap >>> 16) / 256.0f) + 0.03125f);
-//        lightMapUV.set(0.0f, 0.0f);
         lightMapUV.upload();
     }
 
     public void uploadPackedOverlay(int packedOverlay){
-//        BoneTown.LOGGER.info("overlay coords: {}, {}", (short)(packedOverlay & '\uffff'),(short)(packedOverlay >> 16 & '\uffff') );
         overlayUV.set((short)(packedOverlay & '\uffff') / 16.0f, (short)(packedOverlay >>> 16 & '\uffff') / 16.0f);
         overlayUV.upload();
     }

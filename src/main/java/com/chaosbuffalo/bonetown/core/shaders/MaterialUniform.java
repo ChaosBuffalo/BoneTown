@@ -14,10 +14,11 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 @OnlyIn(Dist.CLIENT)
-public class BTShaderUniform implements AutoCloseable {
+public class MaterialUniform implements AutoCloseable {
 
     private int uniformLocation;
     private final int uniformCount;
+    private int matCount;
     public enum UniformType {
         int1,
         int2,
@@ -92,14 +93,15 @@ public class BTShaderUniform implements AutoCloseable {
     private boolean dirty;
     private final IShaderManager shaderManager;
 
-    public BTShaderUniform(String name, UniformType type, IShaderManager manager){
+    public MaterialUniform(String name, UniformType type, IShaderManager manager){
         this(name, type, 1, manager);
     }
 
-    public BTShaderUniform(String name, UniformType type, int count, IShaderManager manager) {
+    public MaterialUniform(String name, UniformType type, int count, IShaderManager manager) {
         this.uniformName = name;
         this.uniformCount = count;
         this.uniformType = type;
+        this.matCount = 1;
         this.shaderManager = manager;
         if (isIntType(type)) {
             this.uniformIntBuffer = MemoryUtil.memAllocInt(count * getCountForType(type));
@@ -226,10 +228,29 @@ public class BTShaderUniform implements AutoCloseable {
         if (uniformType == UniformType.mat4x4){
             this.uniformFloatBuffer.position(0);
             mat.write(this.uniformFloatBuffer);
+            matCount = 1;
             this.markDirty();
         } else {
             BoneTown.LOGGER.warn(
                     "Trying to upload non 4x4 matrix to 4x4 mat uniform {}",
+                    this.getUniformName());
+        }
+    }
+
+    public void set(int count, org.joml.Matrix4d... mats){
+        if (uniformType == UniformType.vecmat4x4){
+            BoneTown.LOGGER.info("Uploading {} mats", count);
+            this.uniformFloatBuffer.position(0);
+            for (int c = 0; c < count; c++){
+                int offset = 16 * c;
+                mats[c].get(offset, this.uniformFloatBuffer);
+            }
+            matCount = count;
+            this.markDirty();
+        }
+        else {
+            BoneTown.LOGGER.warn(
+                    "Trying to upload mat4x4 vector to non vecmat4x4 type uniform {}",
                     this.getUniformName());
         }
     }
@@ -243,6 +264,7 @@ public class BTShaderUniform implements AutoCloseable {
                 mat.get(offset, this.uniformFloatBuffer);
                 count++;
             }
+            matCount = count;
             this.markDirty();
         }
         else {
@@ -261,6 +283,7 @@ public class BTShaderUniform implements AutoCloseable {
                 mat.get(offset, this.uniformFloatBuffer);
                 count++;
             }
+            matCount = count;
             this.markDirty();
         }
         else {
@@ -303,7 +326,10 @@ public class BTShaderUniform implements AutoCloseable {
                 break;
             case vecmat4x4:
             case mat4x4:
-                RenderSystem.glUniformMatrix4(this.uniformLocation, false, this.uniformFloatBuffer);
+//                RenderSystem.glUniformMatrix4(this.uniformLocation, false, this.uniformFloatBuffer);
+                GlStateManagerExtended.uniformMatrix4fCount(this.uniformLocation, false,
+                        matCount,
+                        this.uniformFloatBuffer);
                 break;
             default:
                 BoneTown.LOGGER.warn("No method for uploading for {}", this.getUniformName());

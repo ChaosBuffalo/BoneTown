@@ -3,6 +3,7 @@ package com.chaosbuffalo.bonetown.core.bonemf;
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
+import com.chaosbuffalo.bonetown.core.animation.Pose;
 import net.minecraft.util.ResourceLocation;
 import org.joml.Matrix4d;
 import javax.annotation.Nullable;
@@ -18,8 +19,8 @@ public class BoneMFSkeleton {
     private final Map<ResourceLocation, BoneMFAnimation> animations;
     private final Map<ResourceLocation, BakedAnimation> bakedAnimations;
     private final Map<String, Matrix4d> boneInversions;
-    private final Matrix4d[] inverseBindPose;
-    private final AnimationFrame bindPose;
+    private final Pose inverseBindPose;
+    private final Pose bindPose;
 
     public BoneMFSkeleton(BoneMFNode root){
         this.root = root;
@@ -30,9 +31,8 @@ public class BoneMFSkeleton {
         boneArray = root.getNodesOfType(BoneMFAttribute.AttributeTypes.SKELETON);
         animations = new HashMap<>();
         bakedAnimations = new HashMap<>();
-        bindPose = new AnimationFrame();
-        inverseBindPose = new Matrix4d[AnimationFrame.MAX_JOINTS];
-        Arrays.fill(inverseBindPose, new Matrix4d());
+        bindPose = new Pose();
+        inverseBindPose = new Pose();
         int count = 0;
         for (BoneMFNode node : boneArray){
             boneIndex.put(node.getName(), node);
@@ -47,17 +47,18 @@ public class BoneMFSkeleton {
             Matrix4d invertedBindPose = new Matrix4d(bindPoseMat).invertAffine();
             boneInversions.put(node.getName(), invertedBindPose);
             bindPose.setJointMatrix(count, bindPoseMat);
-            inverseBindPose[count] = invertedBindPose;
+            inverseBindPose.setJointMatrix(count, invertedBindPose);
             count++;
-
         }
+        bindPose.setJointCount(boneArray.size());
+        inverseBindPose.setJointCount(boneArray.size());
     }
 
-    public AnimationFrame getBindPose() {
+    public Pose getBindPose() {
         return bindPose;
     }
 
-    public Matrix4d[] getInverseBindPose() {
+    public Pose getInverseBindPose() {
         return inverseBindPose;
     }
 
@@ -94,7 +95,9 @@ public class BoneMFSkeleton {
         }
         List<AnimationFrame> frames = new ArrayList<>();
         for (long i = 0; i < animation.getFrameCount(); i++){
-            frames.add(new AnimationFrame());
+            AnimationFrame frame = new AnimationFrame();
+            frame.setJointCount(getBones().size());
+            frames.add(frame);
         }
         for (BoneMFNode bone : getBones()){
             int index = getBoneId(bone.getName());

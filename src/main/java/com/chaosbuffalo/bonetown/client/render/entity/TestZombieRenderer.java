@@ -23,7 +23,7 @@ public class TestZombieRenderer extends BTAnimatedEntityRenderer<TestZombieEntit
     @Override
     public void handleEntityOrientation(MatrixStack matrixStackIn, TestZombieEntity entity, float partialTicks) {
         float renderYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
-        matrixStackIn.rotate(Vector3f.YP.rotationDegrees( 360.0f - renderYaw));
+        matrixStackIn.rotate(Vector3f.YP.rotationDegrees( -renderYaw));
     }
 
     @Override

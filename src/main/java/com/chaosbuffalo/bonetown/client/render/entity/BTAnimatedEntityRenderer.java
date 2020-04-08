@@ -4,16 +4,13 @@ import com.chaosbuffalo.bonetown.client.render.render_data.BTAnimatedModelRender
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
-import com.chaosbuffalo.bonetown.core.shaders.IBTShaderProgram;
+import com.chaosbuffalo.bonetown.core.shaders.IBTMaterial;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 
 
 public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEntity<T>> extends BTEntityRenderer<T> {
@@ -37,7 +34,7 @@ public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEnt
     public void drawModel(RenderType renderType, T entityIn, float entityYaw,
                           float partialTicks, MatrixStack matrixStackIn,
                           Matrix4f projectionMatrix, int packedLightIn,
-                          int packedOverlay, IBTShaderProgram program) {
+                          int packedOverlay, IBTMaterial program) {
         matrixStackIn.push();
         handleEntityOrientation(matrixStackIn, entityIn, partialTicks);
         program.initRender(renderType, matrixStackIn, projectionMatrix, packedLightIn, packedOverlay);
@@ -49,7 +46,7 @@ public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEnt
             // with a particular program and skip it
             program.uploadInverseBindPose(skeleton.getInverseBindPose());
         }
-        program.uploadAnimationFrame(pose.getJointMatrices());
+        program.uploadAnimationFrame(pose);
         modelRenderData.render();
         program.endRender(renderType);
         matrixStackIn.pop();

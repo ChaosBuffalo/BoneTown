@@ -7,6 +7,7 @@ import static com.chaosbuffalo.bonetown.core.animation.AnimationFrame.MAX_JOINTS
 public class Pose implements IPose {
 
     private final Matrix4d[] jointMatrices;
+    private int jointCount;
 
     public Pose() {
         jointMatrices = new Matrix4d[MAX_JOINTS];
@@ -22,6 +23,16 @@ public class Pose implements IPose {
     @Override
     public Matrix4d getJointMatrix(int index) {
         return jointMatrices[index];
+    }
+
+    @Override
+    public int getJointCount() {
+        return jointCount;
+    }
+
+    @Override
+    public void setJointCount(int count) {
+        jointCount = count;
     }
 
     @Override

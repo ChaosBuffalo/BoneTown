@@ -1,8 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render;
 
 
-import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;

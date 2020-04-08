@@ -3,8 +3,8 @@ package com.chaosbuffalo.bonetown.client.render.entity;
 
 import com.chaosbuffalo.bonetown.client.render.render_data.BTModelRenderData;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
-import com.chaosbuffalo.bonetown.core.shaders.BTShaderResourceManager;
-import com.chaosbuffalo.bonetown.core.shaders.IBTShaderProgram;
+import com.chaosbuffalo.bonetown.core.shaders.MaterialResourceManager;
+import com.chaosbuffalo.bonetown.core.shaders.IBTMaterial;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -68,14 +68,14 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
 
     public void drawModel(RenderType renderType, T entityIn, float entityYaw, float partialTicks,
                           MatrixStack matrixStackIn, Matrix4f projectionMatrix, int packedLightIn,
-                          int packedOverlay, IBTShaderProgram program){
+                          int packedOverlay, IBTMaterial program){
 
         program.initRender(renderType, matrixStackIn, projectionMatrix, packedLightIn, packedOverlay);
         modelRenderData.render();
         program.endRender(renderType);
     }
 
-    private void initializeRender(IBTShaderProgram program){
+    private void initializeRender(IBTMaterial program){
         modelRenderData.GLinit();
     }
 
@@ -87,7 +87,7 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         boolean visibleToPlayer = !visible && !entityIn.isInvisibleToPlayer(Minecraft.getInstance().player);
         RenderType rendertype = this.getRenderType(entityIn, visible, visibleToPlayer);
         bufferIn.getBuffer(rendertype);
-        IBTShaderProgram program = BTShaderResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
+        IBTMaterial program = MaterialResourceManager.INSTANCE.getShaderProgram(model.getProgramName());
         if (!modelRenderData.isInitialized()){
            initializeRender(program);
         }

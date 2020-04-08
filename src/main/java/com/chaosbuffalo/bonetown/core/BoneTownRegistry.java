@@ -3,7 +3,7 @@ package com.chaosbuffalo.bonetown.core;
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.BTAdditionalAnimationEntry;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
-import com.chaosbuffalo.bonetown.core.shaders.BTShaderProgramEntry;
+import com.chaosbuffalo.bonetown.core.shaders.BTMaterialEntry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,7 +15,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 public class BoneTownRegistry {
 
     public static IForgeRegistry<BTModel> MODEL_REGISTRY = null;
-    public static IForgeRegistry<BTShaderProgramEntry> SHADER_REGISTRY = null;
+    public static IForgeRegistry<BTMaterialEntry> MATERIAL_REGISTRY = null;
     public static IForgeRegistry<BTAdditionalAnimationEntry> ADDITIONAL_ANIMATION_REGISTRY = null;
 
     @SuppressWarnings("unused")
@@ -28,9 +28,9 @@ public class BoneTownRegistry {
                 .setIDRange(0, Integer.MAX_VALUE - 1)
                 .allowModification()
                 .create();
-        SHADER_REGISTRY = new RegistryBuilder<BTShaderProgramEntry>()
-                .setName(new ResourceLocation(BoneTown.MODID, "shaders"))
-                .setType(BTShaderProgramEntry.class)
+        MATERIAL_REGISTRY = new RegistryBuilder<BTMaterialEntry>()
+                .setName(new ResourceLocation(BoneTown.MODID, "materials"))
+                .setType(BTMaterialEntry.class)
                 .setIDRange(0, Integer.MAX_VALUE - 1)
                 .allowModification()
                 .create();

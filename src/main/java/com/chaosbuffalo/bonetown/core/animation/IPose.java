@@ -8,10 +8,14 @@ public interface IPose {
 
     Matrix4d getJointMatrix(int index);
 
+    int getJointCount();
+
+    void setJointCount(int count);
+
     void setJointMatrix(int index, Matrix4d mat);
 
     default void copyPose(IPose otherPose) {
-        for (int i = 0; i < otherPose.getJointMatrices().length; i++){
+        for (int i = 0; i < otherPose.getJointCount(); i++){
             setJointMatrix(i, otherPose.getJointMatrix(i));
         }
     }
