@@ -168,10 +168,12 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         World world = getEntity().getEntityWorld();
         if (!world.isRemote()){
             if (syncQueue.size() > 0){
-                EntityAnimationClientUpdatePacket packet = new EntityAnimationClientUpdatePacket(getEntity(),
-                        syncQueue.toArray(new AnimationMessage[0]));
-                PacketDistributor.TRACKING_ENTITY.with(this::getEntity).send(PacketHandler.getNetworkChannel()
-                        .toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
+                EntityAnimationClientUpdatePacket packet = new EntityAnimationClientUpdatePacket(
+                        getEntity(),
+                        syncQueue);
+                PacketDistributor.TRACKING_ENTITY.with(this::getEntity)
+                        .send(PacketHandler.getNetworkChannel().toVanillaPacket(
+                                packet, NetworkDirection.PLAY_TO_CLIENT));
                 syncQueue.clear();
             }
         }

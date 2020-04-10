@@ -19,6 +19,6 @@ public abstract class AnimatedLivingEntityRenderer<T extends LivingEntity & IBTA
     @Override
     public void handleEntityOrientation(MatrixStack matrixStackIn, T entity, float partialTicks) {
         float renderYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
-        matrixStackIn.rotate(Vector3f.YP.rotationDegrees( -renderYaw));
+        matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-renderYaw));
     }
 }

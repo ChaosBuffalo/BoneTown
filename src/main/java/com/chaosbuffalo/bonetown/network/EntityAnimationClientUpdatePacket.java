@@ -20,9 +20,9 @@ public class EntityAnimationClientUpdatePacket {
     private int entityId;
     private List<AnimationMessage> messages;
 
-    public EntityAnimationClientUpdatePacket(Entity entity, AnimationMessage... messages){
+    public EntityAnimationClientUpdatePacket(Entity entity, List<AnimationMessage> messages){
         entityId = entity.getEntityId();
-        this.messages = Arrays.asList(messages);
+        this.messages = messages;
     }
 
     public EntityAnimationClientUpdatePacket(PacketBuffer buffer){
