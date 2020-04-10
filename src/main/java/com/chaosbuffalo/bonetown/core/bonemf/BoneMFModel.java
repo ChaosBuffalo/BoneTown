@@ -63,9 +63,17 @@ public class BoneMFModel {
         return animated;
     }
 
+
     public List<BakedMesh> bakeMeshes(){
         List<BakedMesh> meshes = new ArrayList<>();
         List<BoneMFNode> meshNodes = getRootNode().getNodesOfType(BoneMFAttribute.AttributeTypes.MESH);
+        List<Float> positions = new ArrayList<>();
+        List<Float> uvs = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
+        List<Integer> boneIds = new ArrayList<>();
+        List<Float> boneWeights = new ArrayList<>();
+        List<Integer> finalTrangles = new ArrayList<>();
+        int offset = 0;
         for (BoneMFNode meshNode : meshNodes){
             BoneMFMeshAttribute meshAttribute = meshNode.getMesh();
             if (meshAttribute == null){
@@ -75,9 +83,9 @@ public class BoneMFModel {
             }
             List<Integer> triangles = meshAttribute.getTriangles();
             List<BoneMFVertex> vertices = meshAttribute.getVertices();
-            List<Float> positions = new ArrayList<>();
-            List<Float> uvs = new ArrayList<>();
-            List<Float> normals = new ArrayList<>();
+            for (int index : triangles){
+                finalTrangles.add(index + offset);
+            }
             Matrix4d transform = meshNode.getGlobalTransform();
             for (BoneMFVertex vertex : vertices){
                 Vector4d posVec = new Vector4d(vertex.x, vertex.y, vertex.z, 1.0);
@@ -93,11 +101,10 @@ public class BoneMFModel {
                 normals.add((float) normVec.y());
                 normals.add((float) normVec.z());
             }
-            BakedMesh mesh;
-            if (getSkeleton().isPresent()){
+            offset += vertices.size();
+            if (getSkeleton().isPresent()) {
                 BoneMFSkeleton skeleton = getSkeleton().get();
-                List<Integer> boneIds = new ArrayList<>();
-                List<Float> boneWeights = new ArrayList<>();
+
                 for (BoneMFVertex vertex : vertices) {
                     int size = vertex.boneWeights.size();
 
@@ -112,15 +119,18 @@ public class BoneMFModel {
                         }
                     }
                 }
-                mesh = new BakedAnimatedMesh(meshNode.getName(), Utils.listToArray(positions),
-                        Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles),
-                        Utils.listToArray(boneWeights), Utils.listIntToArray(boneIds));
-            } else {
-                mesh = new BakedMesh(meshNode.getName(), Utils.listToArray(positions),
-                        Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles));
             }
-            meshes.add(mesh);
         }
+        BakedMesh mesh;
+        if (getSkeleton().isPresent()) {
+            mesh = new BakedAnimatedMesh(name.toString(), Utils.listToArray(positions),
+                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTrangles),
+                    Utils.listToArray(boneWeights), Utils.listIntToArray(boneIds));
+        } else {
+            mesh = new BakedMesh(name.toString(), Utils.listToArray(positions),
+                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTrangles));
+        }
+        meshes.add(mesh);
         return meshes;
     }
 

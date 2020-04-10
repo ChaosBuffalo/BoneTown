@@ -13,7 +13,7 @@ public class TestAnimatedRenderer extends BTAnimatedEntityRenderer<TestAnimatedE
             "bonetown/textures/zombie.png");
 
     public TestAnimatedRenderer(final EntityRendererManager renderManager) {
-        super(renderManager, (BTAnimatedModel) BTModels.BIPED);
+        super(renderManager, (BTAnimatedModel) BTModels.BIPED, 1.0f);
     }
 
     @Override

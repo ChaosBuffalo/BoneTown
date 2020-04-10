@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
+import com.chaosbuffalo.bonetown.client.render.BTClientMathUtils;
 import com.chaosbuffalo.bonetown.client.render.render_data.BTAnimatedModelRenderData;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
@@ -11,15 +12,17 @@ import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
+import org.joml.Matrix4d;
 
 
 public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEntity<T>> extends BTEntityRenderer<T> {
     private BTAnimatedModel animatedModel;
 
-    protected BTAnimatedEntityRenderer(EntityRendererManager renderManager, BTAnimatedModel model) {
+    protected BTAnimatedEntityRenderer(EntityRendererManager renderManager, BTAnimatedModel model, float shadowSize) {
         super(renderManager, model);
         this.animatedModel = model;
         this.modelRenderData = new BTAnimatedModelRenderData(model, renderManager);
+        this.shadowSize = shadowSize;
     }
 
     public BTAnimatedModel getAnimatedModel() {
@@ -28,6 +31,17 @@ public abstract class BTAnimatedEntityRenderer<T extends Entity & IBTAnimatedEnt
 
     public void handleEntityOrientation(MatrixStack matrixStackIn, T entity, float partialTicks){
 
+    }
+
+    protected void moveMatrixStackToBone(T entityIn, String boneName, MatrixStack matrixStack, IPose pose){
+        BoneMFSkeleton skeleton = entityIn.getSkeleton();
+        if (skeleton != null){
+            int boneId = skeleton.getBoneId(boneName);
+            if (boneId != -1){
+                Matrix4d boneMat = pose.getJointMatrix(boneId);
+                BTClientMathUtils.applyTransformToStack(boneMat, matrixStack);
+            }
+        }
     }
 
     @Override
