@@ -68,7 +68,7 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
 
     public void drawModel(RenderType renderType, T entityIn, float entityYaw, float partialTicks,
                           MatrixStack matrixStackIn, Matrix4f projectionMatrix, int packedLightIn,
-                          int packedOverlay, IBTMaterial program){
+                          int packedOverlay, IBTMaterial program, IRenderTypeBuffer buffer){
 
         program.initRender(renderType, matrixStackIn, projectionMatrix, packedLightIn, packedOverlay);
         modelRenderData.render();
@@ -103,7 +103,7 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         drawModel(rendertype, entityIn,
                 entityYaw, partialTicks, matrixStackIn,
                 projMatrix, packedLightIn,
-                packedOverlay, program);
+                packedOverlay, program, bufferIn);
 
 
     }

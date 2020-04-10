@@ -9,6 +9,7 @@ import com.chaosbuffalo.bonetown.entity.animation_state.layers.HeadTrackingLayer
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LocomotionLayer;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import com.chaosbuffalo.bonetown.init.BTModels;
+import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +17,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<TestZombieEntity> {
+public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<TestZombieEntity>, IHasHandBones {
 
     private AnimationComponent<TestZombieEntity> animationComponent;
     BTAnimatedModel animatedModel;
@@ -69,5 +70,15 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
     @Override
     public BoneMFSkeleton getSkeleton() {
         return skeleton;
+    }
+
+    @Override
+    public String getRightHandBoneName() {
+        return "bn_hand_r";
+    }
+
+    @Override
+    public String getLeftHandBoneName() {
+        return "bn_hand_l";
     }
 }

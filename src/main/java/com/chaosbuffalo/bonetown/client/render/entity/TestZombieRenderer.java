@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-public class TestZombieRenderer extends BTAnimatedEntityRenderer<TestZombieEntity> {
+public class TestZombieRenderer extends AnimatedBipedRenderer<TestZombieEntity> {
 
     public static final ResourceLocation ZOMBIE_TEXTURE = new ResourceLocation(BoneTown.MODID,
             "bonetown/textures/zombie.png");
@@ -20,11 +20,7 @@ public class TestZombieRenderer extends BTAnimatedEntityRenderer<TestZombieEntit
     }
 
 
-    @Override
-    public void handleEntityOrientation(MatrixStack matrixStackIn, TestZombieEntity entity, float partialTicks) {
-        float renderYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
-        matrixStackIn.rotate(Vector3f.YP.rotationDegrees( -renderYaw));
-    }
+
 
     @Override
     public ResourceLocation getEntityTexture(TestZombieEntity entity) {
