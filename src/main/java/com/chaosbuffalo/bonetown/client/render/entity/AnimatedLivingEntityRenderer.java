@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
+import com.chaosbuffalo.bonetown.client.render.layers.AnimatedArmorLayer;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -14,6 +15,7 @@ public abstract class AnimatedLivingEntityRenderer<T extends LivingEntity & IBTA
     protected AnimatedLivingEntityRenderer(EntityRendererManager renderManager,
                                            BTAnimatedModel model, float shadowSize) {
         super(renderManager, model, shadowSize);
+        addRenderLayer(new AnimatedArmorLayer<>(this, model));
     }
 
     @Override

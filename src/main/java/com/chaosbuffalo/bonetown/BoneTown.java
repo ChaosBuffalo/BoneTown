@@ -6,6 +6,7 @@ import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
 import com.chaosbuffalo.bonetown.client.render.entity.TestZombieRenderer;
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
+import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
 import com.chaosbuffalo.bonetown.core.proxy.IBTProxy;
 import com.chaosbuffalo.bonetown.core.proxy.ServerProxy;
@@ -43,6 +44,12 @@ public class BoneTown
         BoneTownRegistry.ADDITIONAL_ANIMATION_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
         BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().getModel().getSkeleton()
                 .ifPresent(BoneMFSkeleton::bakeAnimations));
+        BoneTownRegistry.ARMOR_MODEL_REGISTRY.getEntries().forEach((x) -> x.getValue().load());
+        BoneTownRegistry.MODEL_REGISTRY.getEntries().forEach((x) -> {
+            if (x.getValue() instanceof BTAnimatedModel){
+                ((BTAnimatedModel) x.getValue()).bakeArmors();
+            }
+        });
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

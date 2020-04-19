@@ -1,4 +1,4 @@
-package com.chaosbuffalo.bonetown.core.shaders;
+package com.chaosbuffalo.bonetown.core.materials;
 
 import net.minecraft.client.shader.ShaderLoader;
 import net.minecraft.util.ResourceLocation;

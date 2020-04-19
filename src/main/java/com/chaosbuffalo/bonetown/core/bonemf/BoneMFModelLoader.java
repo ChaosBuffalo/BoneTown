@@ -10,6 +10,7 @@ import org.joml.Vector4d;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 
 public class BoneMFModelLoader {
@@ -72,7 +73,7 @@ public class BoneMFModelLoader {
                 break;
             }
             default:
-                attr = null;
+                attr = new BoneMFAttribute(BoneMFAttribute.AttributeTypes.NULL, owner);
                 BoneTown.LOGGER.error("Failed to parse attribute: %s", cbor.toString());
         }
         return attr;
@@ -160,7 +161,7 @@ public class BoneMFModelLoader {
         mfNode.setScalingOffset(parseVector(node.get("scalingOffset")));
         mfNode.setScalingPivot(parseVector(node.get("scalingPivot")));
         mfNode.setTranslation(parseVector(node.get("translation")));
-        mfNode.setGlobalTransform(parseMatrix(node.get("global")));
+//        mfNode.setGlobalTransform(parseMatrix(node.get("global")));
 
         CBORObject attributes = node.get("attributes");
         if (!attributes.isNull()){
@@ -183,10 +184,18 @@ public class BoneMFModelLoader {
 
     public static void loadAnimations(BoneMFModel model, CBORObject animationsCbor, ResourceLocation name){
         model.getSkeleton().ifPresent((BoneMFSkeleton skeleton) -> {
+            int count = animationsCbor.size();
+            int i = 0;
             for (CBORObject key : animationsCbor.getKeys()){
                 String animationName = key.AsString();
                 CBORObject animationCbor = animationsCbor.get(animationName);
-                skeleton.addAnimation(name, parseAnimation(animationName, animationCbor));
+                ResourceLocation animName;
+                if (count > 1 ){
+                    animName = new ResourceLocation(name.getNamespace(), name.getPath() + "_" + count);
+                } else {
+                    animName = name;
+                }
+                skeleton.addAnimation(animName, parseAnimation(animationName, animationCbor));
             }
         });
     }
@@ -202,11 +211,16 @@ public class BoneMFModelLoader {
         }
     }
 
-    public static BoneMFModel load(ByteBuffer resource, ResourceLocation name)
-            throws Exception {
-
+    public static BoneMFArmorModel loadArmor(ByteBuffer resource, ResourceLocation name,
+                                             List<String> headMeshes, List<String> bodyMeshes,
+                                             List<String> legMeshes, List<String> feetMeshes) throws Exception {
         InputStream stream = asInputStream(resource);
         CBORObject cbor = CBORObject.Read(stream);
+        BoneMFNode root = loadRootNode(cbor, name);
+        return new BoneMFArmorModel(name, root, headMeshes, bodyMeshes, legMeshes, feetMeshes);
+    }
+
+    private static BoneMFNode loadRootNode(CBORObject cbor, ResourceLocation name) throws Exception {
         CBORObject nodes = cbor.get("nodes");
         BoneMFNode root = new BoneMFNode(name.toString());
         if (!nodes.isNull()){
@@ -218,6 +232,14 @@ public class BoneMFModelLoader {
             BoneMFNode firstChild = root.getChildren().get(0);
             root.setInheritType(firstChild.getInheritType());
         }
+        return root;
+    }
+
+    public static BoneMFModel load(ByteBuffer resource, ResourceLocation name)
+            throws Exception {
+        InputStream stream = asInputStream(resource);
+        CBORObject cbor = CBORObject.Read(stream);
+        BoneMFNode root = loadRootNode(cbor, name);
         BoneMFModel model = new BoneMFModel(name, root);
         if (cbor.ContainsKey("animations")){
             CBORObject animations = cbor.get("animations");
@@ -225,7 +247,6 @@ public class BoneMFModelLoader {
                 loadAnimations(model, animations, name);
             }
         }
-
         return model;
     }
 

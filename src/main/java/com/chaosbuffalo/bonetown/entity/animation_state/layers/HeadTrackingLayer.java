@@ -13,10 +13,20 @@ import org.joml.Vector4d;
 public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity<T>> extends AnimationLayerBase<T> {
 
     private final String boneName;
+    private float rotLimit;
 
     public HeadTrackingLayer(String name, T entity, String headBoneName){
         super(name, entity);
         boneName = headBoneName;
+        rotLimit = 85.0f;
+    }
+
+    public float getRotLimit() {
+        return rotLimit;
+    }
+
+    public void setRotLimit(float rotLimit) {
+        this.rotLimit = rotLimit;
     }
 
     public String getBoneName(){
@@ -33,50 +43,43 @@ public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity<T>> ex
         BoneMFNode bone = skeleton.getBone(getBoneName());
         T entity = getEntity();
         if (bone != null) {
-            float f = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
-            float f1 = MathHelper.interpolateAngle(partialTicks, entity.prevRotationYawHead, entity.rotationYawHead);
+            float bodyYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
+            float headYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRotationYawHead, entity.rotationYawHead);
             boolean shouldSit = entity.isPassenger() && (entity.getRidingEntity() != null &&
                     entity.getRidingEntity().shouldRiderSit());
-            float netHeadYaw = f1 - f;
+            float netHeadYaw = headYaw - bodyYaw;
             if (shouldSit && entity.getRidingEntity() instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity) entity.getRidingEntity();
-                f = MathHelper.interpolateAngle(partialTicks, livingentity.prevRenderYawOffset,
+                bodyYaw = MathHelper.interpolateAngle(partialTicks, livingentity.prevRenderYawOffset,
                         livingentity.renderYawOffset);
-                netHeadYaw = f1 - f;
-                float f3 = MathHelper.wrapDegrees(netHeadYaw);
-                if (f3 < -85.0F) {
-                    f3 = -85.0F;
+                netHeadYaw = headYaw - bodyYaw;
+                float wrapped = MathHelper.wrapDegrees(netHeadYaw);
+                if (wrapped < -rotLimit) {
+                    wrapped = -rotLimit;
                 }
 
-                if (f3 >= 85.0F) {
-                    f3 = 85.0F;
+                if (wrapped >= rotLimit) {
+                    wrapped = rotLimit;
                 }
 
-                f = f1 - f3;
-                if (f3 * f3 > 2500.0F) {
-                    f += f3 * 0.2F;
+                bodyYaw = headYaw - wrapped;
+                if (wrapped * wrapped > 2500.0F) {
+                    bodyYaw += wrapped * 0.2F;
                 }
-                netHeadYaw = f1 - f;
+                netHeadYaw = headYaw - bodyYaw;
             }
             float headPitch = MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch);
             float rotateY = netHeadYaw * ((float) Math.PI / 180F);
             boolean isFlying = entity.getTicksElytraFlying() > 4;
-            boolean isSwimming = entity.isActualySwimming();
             float rotateX;
             if (isFlying) {
                 rotateX = (-(float) Math.PI / 4F);
-//                } else if (this.swimAnimation > 0.0F) {
-//                    if (isSwimming) {
-//                        this.bipedHead.rotateAngleX = this.rotLerpRad(this.bipedHead.rotateAngleX, (-(float)Math.PI / 4F), this.swimAnimation);
-//                    } else {
-//                        this.bipedHead.rotateAngleX = this.rotLerpRad(this.bipedHead.rotateAngleX, headPitch * ((float)Math.PI / 180F), this.swimAnimation);
-//                    }
             } else {
                 rotateX = headPitch * ((float) Math.PI / 180F);
             }
             Vector4d headRotation = new Vector4d(rotateX, rotateY, 0.0, 1.0);
-            Matrix4d headTransform = bone.calculateLocalTransform(new Vector4d(0.0, 0.0, 0.0, 1.0),
-                    headRotation, new Vector4d(1.0, 1.0, 1.0, 1.0));
+            Matrix4d headTransform = bone.calculateLocalTransform(bone.getTranslation(),
+                    headRotation, bone.getScaling());
             int boneId = skeleton.getBoneId(getBoneName());
             int parentBoneId = skeleton.getBoneParentId(getBoneName());
             Matrix4d parentTransform;

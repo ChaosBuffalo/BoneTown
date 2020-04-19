@@ -29,7 +29,6 @@ public class BoneMFNode {
     private Vector4d scalingPivot;
     private Vector4d rotationOffset;
     private Vector4d rotationPivot;
-    private Matrix4d globalTransform;
 
     private Matrix4d _globalTransform;
 
@@ -94,13 +93,6 @@ public class BoneMFNode {
         this.setScalingOffset(new Vector4d(0.0, 0.0, 0.0, 1.0));
     }
 
-    public void setGlobalTransform(Matrix4d globalTransform) {
-        this.globalTransform = globalTransform;
-    }
-
-    public Matrix4d getGlobalTransform() {
-        return globalTransform;
-    }
 
     @Nullable
     public <T extends BoneMFAttribute> T getAttributeForType(BoneMFAttribute.AttributeTypes type,

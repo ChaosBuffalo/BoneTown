@@ -30,7 +30,6 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     private float lastPartialTicks;
     private String currentState;
     public static final String INVALID_STATE = "invalid";
-    private static final double SYNC_RANGE = 50.0 * 50.0;
 
     private final List<AnimationMessage> syncQueue;
 

@@ -1,10 +1,12 @@
 package com.chaosbuffalo.bonetown.client.render.entity;
 
 
+import com.chaosbuffalo.bonetown.client.render.RenderDataManager;
 import com.chaosbuffalo.bonetown.client.render.render_data.BTModelRenderData;
+import com.chaosbuffalo.bonetown.client.render.render_data.IBTRenderDataContainer;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
-import com.chaosbuffalo.bonetown.core.shaders.MaterialResourceManager;
-import com.chaosbuffalo.bonetown.core.shaders.IBTMaterial;
+import com.chaosbuffalo.bonetown.core.materials.MaterialResourceManager;
+import com.chaosbuffalo.bonetown.core.materials.IBTMaterial;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -20,13 +22,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<T> {
 
     private BTModel model;
-    BTModelRenderData modelRenderData;
+    protected IBTRenderDataContainer modelRenderData;
     HashMap<T, Boolean> activeEntities;
 
 
@@ -34,8 +37,14 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         super(renderManager);
         this.model = model;
         this.activeEntities = new HashMap<>();
-        this.modelRenderData = new BTModelRenderData(model, renderManager);
+        setupModelRenderData(model);
+
     }
+
+    protected void setupModelRenderData(BTModel model){
+        this.modelRenderData = RenderDataManager.MANAGER.getRenderDataForModel(model, true);
+    }
+
 
     @Override
     public boolean shouldRender(T livingEntityIn, ClippingHelperImpl camera, double camX, double camY, double camZ) {
@@ -58,13 +67,6 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         return !livingEntityIn.isInvisible();
     }
 
-    public void addEntity(T entityIn) {
-        activeEntities.put(entityIn, true);
-    }
-
-    public void remoteEntity(T entityIn){
-        activeEntities.remove(entityIn);
-    }
 
     public void drawModel(RenderType renderType, T entityIn, float entityYaw, float partialTicks,
                           MatrixStack matrixStackIn, Matrix4f projectionMatrix, int packedLightIn,
@@ -76,10 +78,11 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
     }
 
     private void initializeRender(IBTMaterial program){
-        modelRenderData.GLinit();
+        modelRenderData.upload();
     }
 
     @Override
+    @ParametersAreNonnullByDefault
     public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn,
                        IRenderTypeBuffer bufferIn, int packedLightIn) {
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

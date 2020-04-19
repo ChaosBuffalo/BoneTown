@@ -23,6 +23,7 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
     public final BoneTownConstants.MeshTypes meshType;
     protected BoneMFModel model;
     private BakedMesh[] meshes;
+    private BakedMesh combinedMesh;
 
     public BTModel(ResourceLocation name, BoneTownConstants.MeshTypes meshType){
         this(name, BTMaterials.DEFAULT_STATIC_LOC, meshType);
@@ -34,6 +35,10 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
         setRegistryName(name);
         this.meshType = meshType;
         this.programName = programName;
+    }
+
+    public BakedMesh getCombinedMesh() {
+        return combinedMesh;
     }
 
     public BakedMesh[] getMeshes(){
@@ -63,6 +68,7 @@ public class BTModel implements IForgeRegistryEntry<BTModel> {
             try {
                 this.model = BoneMFModelLoader.load(data, name);
                 this.meshes = model.bakeMeshes().toArray(new BakedMesh[0]);
+                this.combinedMesh = model.bakeCombinedMesh();
             } catch (Exception e) {
                 e.printStackTrace();
             }

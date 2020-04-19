@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+
 public class BoneMFModel {
     public static int MAX_WEIGHTS = 4;
     private final BoneMFNode rootNode;
@@ -26,7 +27,6 @@ public class BoneMFModel {
         this.rootNode = rootNode;
         this.name = name;
         BoneMFNode skeletonRoot = rootNode.getNodeWithAttributeType(BoneMFAttribute.AttributeTypes.SKELETON);
-
         if (skeletonRoot != null){
             BoneTown.LOGGER.info("Found skeleton root for {}: {}",
                     rootNode.getName(), skeletonRoot.toString());
@@ -63,18 +63,26 @@ public class BoneMFModel {
         return animated;
     }
 
+    public BakedAnimatedMesh getCombinedAnimatedMesh(){
+        BakedMesh mesh = bakeCombinedMesh();
+        return (BakedAnimatedMesh) mesh;
+    }
 
-    public List<BakedMesh> bakeMeshes(){
-        List<BakedMesh> meshes = new ArrayList<>();
+    public BakedMesh bakeCombinedMesh(){
         List<BoneMFNode> meshNodes = getRootNode().getNodesOfType(BoneMFAttribute.AttributeTypes.MESH);
+        return bakeCombinedMesh(meshNodes);
+    }
+
+    public BakedMesh bakeCombinedMesh(List<BoneMFNode> meshNodes){
         List<Float> positions = new ArrayList<>();
         List<Float> uvs = new ArrayList<>();
         List<Float> normals = new ArrayList<>();
         List<Integer> boneIds = new ArrayList<>();
         List<Float> boneWeights = new ArrayList<>();
-        List<Integer> finalTrangles = new ArrayList<>();
+        List<Integer> finalTriangles = new ArrayList<>();
         int offset = 0;
         for (BoneMFNode meshNode : meshNodes){
+            BoneTown.LOGGER.info("Baking Combined Mesh, Adding Mesh Node: {}", meshNode.getName());
             BoneMFMeshAttribute meshAttribute = meshNode.getMesh();
             if (meshAttribute == null){
                 BoneTown.LOGGER.warn("Failed to find mesh attribute for {}, skipping bake.",
@@ -84,9 +92,9 @@ public class BoneMFModel {
             List<Integer> triangles = meshAttribute.getTriangles();
             List<BoneMFVertex> vertices = meshAttribute.getVertices();
             for (int index : triangles){
-                finalTrangles.add(index + offset);
+                finalTriangles.add(index + offset);
             }
-            Matrix4d transform = meshNode.getGlobalTransform();
+            Matrix4d transform = meshNode.calculateGlobalTransform();
             for (BoneMFVertex vertex : vertices){
                 Vector4d posVec = new Vector4d(vertex.x, vertex.y, vertex.z, 1.0);
                 posVec.mulAffine(transform, posVec);
@@ -124,13 +132,73 @@ public class BoneMFModel {
         BakedMesh mesh;
         if (getSkeleton().isPresent()) {
             mesh = new BakedAnimatedMesh(name.toString(), Utils.listToArray(positions),
-                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTrangles),
+                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTriangles),
                     Utils.listToArray(boneWeights), Utils.listIntToArray(boneIds));
         } else {
             mesh = new BakedMesh(name.toString(), Utils.listToArray(positions),
-                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTrangles));
+                    Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(finalTriangles));
         }
-        meshes.add(mesh);
+        return mesh;
+    }
+
+
+    public List<BakedMesh> bakeMeshes(){
+        List<BakedMesh> meshes = new ArrayList<>();
+        List<BoneMFNode> meshNodes = getRootNode().getNodesOfType(BoneMFAttribute.AttributeTypes.MESH);
+        for (BoneMFNode meshNode : meshNodes){
+            BoneMFMeshAttribute meshAttribute = meshNode.getMesh();
+            if (meshAttribute == null){
+                BoneTown.LOGGER.warn("Failed to find mesh attribute for {}, skipping bake.",
+                        meshNode.getName());
+                continue;
+            }
+            List<Integer> triangles = meshAttribute.getTriangles();
+            List<BoneMFVertex> vertices = meshAttribute.getVertices();
+            List<Float> positions = new ArrayList<>();
+            List<Float> uvs = new ArrayList<>();
+            List<Float> normals = new ArrayList<>();
+            Matrix4d transform = meshNode.calculateGlobalTransform();
+            for (BoneMFVertex vertex : vertices){
+                Vector4d posVec = new Vector4d(vertex.x, vertex.y, vertex.z, 1.0);
+                posVec.mulAffine(transform, posVec);
+                Vector4d normVec = new Vector4d(vertex.nX, vertex.nY, vertex.nZ, 0.0);
+                normVec.mul(transform, normVec);
+                positions.add((float) posVec.x());
+                positions.add((float) posVec.y());
+                positions.add((float) posVec.z());
+                uvs.add((float) vertex.u);
+                uvs.add((float) vertex.v);
+                normals.add((float) normVec.x());
+                normals.add((float) normVec.y());
+                normals.add((float) normVec.z());
+            }
+            BakedMesh mesh;
+            if (getSkeleton().isPresent()){
+                BoneMFSkeleton skeleton = getSkeleton().get();
+                List<Integer> boneIds = new ArrayList<>();
+                List<Float> boneWeights = new ArrayList<>();
+                for (BoneMFVertex vertex : vertices) {
+                    int size = vertex.boneWeights.size();
+                    for (int i = 0; i < MAX_WEIGHTS; i++) {
+                        if (i < size) {
+                            Tuple<String, Double> weight = vertex.boneWeights.get(i);
+                            boneWeights.add(weight.getB().floatValue());
+                            boneIds.add(skeleton.getBoneId(weight.getA()));
+                        } else {
+                            boneWeights.add(0.0f);
+                            boneIds.add(0);
+                        }
+                    }
+                }
+                mesh = new BakedAnimatedMesh(meshNode.getName(), Utils.listToArray(positions),
+                        Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles),
+                        Utils.listToArray(boneWeights), Utils.listIntToArray(boneIds));
+            } else {
+                mesh = new BakedMesh(meshNode.getName(), Utils.listToArray(positions),
+                        Utils.listToArray(uvs), Utils.listToArray(normals), Utils.listIntToArray(triangles));
+            }
+            meshes.add(mesh);
+        }
         return meshes;
     }
 

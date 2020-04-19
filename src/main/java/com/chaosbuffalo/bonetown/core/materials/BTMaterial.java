@@ -1,4 +1,4 @@
-package com.chaosbuffalo.bonetown.core.shaders;
+package com.chaosbuffalo.bonetown.core.materials;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.client.render.GlobalRenderInfo;

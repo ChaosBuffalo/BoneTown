@@ -83,6 +83,8 @@ public class BoneMFSkeleton {
     }
 
     public void addAnimation(ResourceLocation animName, BoneMFAnimation animation){
+        BoneTown.LOGGER.info("Adding animation: {} to {}", animName.toString(),
+                getRoot().getName());
         animations.put(animName, animation);
     }
 

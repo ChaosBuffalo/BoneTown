@@ -2,11 +2,13 @@ package com.chaosbuffalo.bonetown.client.render.layers;
 
 import com.chaosbuffalo.bonetown.client.render.entity.BTAnimatedEntityRenderer;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
+import com.chaosbuffalo.bonetown.core.materials.IBTMaterial;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.IHasHandBones;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
@@ -26,7 +28,8 @@ public class AnimatedHeldItemLayer<T extends LivingEntity & IBTAnimatedEntity<T>
 
     @Override
     public void render(MatrixStack matrixStack, IRenderTypeBuffer renderBuffer, int packedLight, T entityIn,
-                       IPose pose, float partialTicks, float ageInTicks) {
+                       IPose pose, float partialTicks, float ageInTicks, IBTMaterial currentMaterial,
+                       Matrix4f projectionMatrix) {
         boolean isRightHanded = entityIn.getPrimaryHand() == HandSide.RIGHT;
         ItemStack leftHandItem = isRightHanded ? entityIn.getHeldItemOffhand() : entityIn.getHeldItemMainhand();
         ItemStack rightHandItem = isRightHanded ? entityIn.getHeldItemMainhand() : entityIn.getHeldItemOffhand();

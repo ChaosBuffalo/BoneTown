@@ -11,16 +11,21 @@ public class BTAnimatedModelRenderData extends BTModelRenderData {
 
     private BTAnimatedModel animatedModel;
 
-    public BTAnimatedModelRenderData(BTAnimatedModel modelIn, EntityRendererManager managerIn) {
-        super(modelIn, managerIn);
+    public BTAnimatedModelRenderData(BTAnimatedModel modelIn, boolean doCombined) {
+        super(modelIn, doCombined);
         this.animatedModel = modelIn;
     }
 
     @Override
     public Map<String, IBTRenderData> getRenderData() {
         HashMap<String, IBTRenderData> ret = new HashMap<>();
-        for (BakedAnimatedMesh mesh : animatedModel.getAnimatedMeshes()){
+        if (doCombined){
+            BakedAnimatedMesh mesh = animatedModel.getCombinedAnimatedMesh();
             ret.put(mesh.name, new BTAnimatedMeshRenderData(mesh));
+        } else {
+            for (BakedAnimatedMesh mesh : animatedModel.getAnimatedMeshes()){
+                ret.put(mesh.name, new BTAnimatedMeshRenderData(mesh));
+            }
         }
         return ret;
     }

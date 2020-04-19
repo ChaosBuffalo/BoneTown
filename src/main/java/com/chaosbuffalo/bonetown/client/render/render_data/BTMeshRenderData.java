@@ -77,7 +77,7 @@ public class BTMeshRenderData implements IBTRenderData {
         GlStateManagerExtended.bufferData(GL_ELEMENT_ARRAY_BUFFER, indicesByteBuffer, GL_STATIC_DRAW);
     }
 
-    public int genVBO(){
+    protected int genVBO(){
         int vbo = GlStateManagerExtended.genBuffers();
         vboIdList.add(vbo);
         return vbo;

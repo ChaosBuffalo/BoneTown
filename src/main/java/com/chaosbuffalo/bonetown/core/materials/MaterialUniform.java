@@ -1,4 +1,4 @@
-package com.chaosbuffalo.bonetown.core.shaders;
+package com.chaosbuffalo.bonetown.core.materials;
 
 import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.client.render.platform.GlStateManagerExtended;
@@ -239,7 +239,6 @@ public class MaterialUniform implements AutoCloseable {
 
     public void set(int count, org.joml.Matrix4d... mats){
         if (uniformType == UniformType.vecmat4x4){
-            BoneTown.LOGGER.info("Uploading {} mats", count);
             this.uniformFloatBuffer.position(0);
             for (int c = 0; c < count; c++){
                 int offset = 16 * c;
@@ -326,7 +325,6 @@ public class MaterialUniform implements AutoCloseable {
                 break;
             case vecmat4x4:
             case mat4x4:
-//                RenderSystem.glUniformMatrix4(this.uniformLocation, false, this.uniformFloatBuffer);
                 GlStateManagerExtended.uniformMatrix4fCount(this.uniformLocation, false,
                         matCount,
                         this.uniformFloatBuffer);

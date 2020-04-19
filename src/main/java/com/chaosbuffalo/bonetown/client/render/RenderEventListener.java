@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -24,5 +25,10 @@ public class RenderEventListener {
         matrixStack.rotate(Vector3f.XP.rotationDegrees(event.getPitch()));
         matrixStack.rotate(Vector3f.YP.rotationDegrees(event.getYaw() + 180.0F));
         GlobalRenderInfo.INFO.setCurrentFrameGlobal(matrixStack);
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public static void renderLast(RenderWorldLastEvent event){
+        RenderDataManager.MANAGER.tick();
     }
 }
