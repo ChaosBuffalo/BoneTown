@@ -35,6 +35,14 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
         return name;
     }
 
+    public void tickState(int currentTicks){
+        for (IAnimationLayer<T> layer : layers){
+            if (layer.shouldRun()){
+                layer.tick(currentTicks);
+            }
+        }
+    }
+
     public void addLayer(IAnimationLayer<T> layer){
         layers.add(layer);
         layerIndex.put(layer.getLayerName(), layer);

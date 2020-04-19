@@ -15,6 +15,7 @@ public class BoneMFSkeleton {
     private final Map<String, BoneMFNode> boneIndex;
     private final Map<String, Integer> boneArrayIndex;
     private final Map<String, Integer> boneParentArrayIndex;
+    private final Map<Integer, Integer> boneIdParentIdIndex;
     private final BoneMFNode root;
     private final Map<ResourceLocation, BoneMFAnimation> animations;
     private final Map<ResourceLocation, BakedAnimation> bakedAnimations;
@@ -28,6 +29,7 @@ public class BoneMFSkeleton {
         boneArrayIndex = new HashMap<>();
         boneParentArrayIndex = new HashMap<>();
         boneInversions = new HashMap<>();
+        boneIdParentIdIndex = new HashMap<>();
         boneArray = root.getNodesOfType(BoneMFAttribute.AttributeTypes.SKELETON);
         animations = new HashMap<>();
         bakedAnimations = new HashMap<>();
@@ -40,8 +42,10 @@ public class BoneMFSkeleton {
             if (node.getParent() != null){
                 int parentId = getBoneId(node.getParent().getName());
                 boneParentArrayIndex.put(node.getName(), parentId);
+                boneIdParentIdIndex.put(count, parentId);
             } else {
                 boneParentArrayIndex.put(node.getName(), -1);
+                boneIdParentIdIndex.put(count, -1);
             }
             Matrix4d bindPoseMat = new Matrix4d(node.calculateGlobalTransform());
             Matrix4d invertedBindPose = new Matrix4d(bindPoseMat).invertAffine();
@@ -70,6 +74,10 @@ public class BoneMFSkeleton {
         return boneParentArrayIndex.get(name);
     }
 
+    public int getBoneIdParentId(int id) {
+        return boneIdParentIdIndex.get(id);
+    }
+
     public BoneMFNode getBone(String name){
         return boneIndex.get(name);
     }
@@ -86,6 +94,31 @@ public class BoneMFSkeleton {
         BoneTown.LOGGER.info("Adding animation: {} to {}", animName.toString(),
                 getRoot().getName());
         animations.put(animName, animation);
+    }
+
+    private void addChildrenToList(BoneMFNode node, List<BoneMFNode> list){
+        list.add(node);
+        for (BoneMFNode child : node.getChildren()){
+            addChildrenToList(child, list);
+        }
+    }
+
+    public List<BoneMFNode> getSubTree(String name){
+        BoneMFNode node = getBone(name);
+        List<BoneMFNode> ret = new ArrayList<>();
+        if (node != null){
+            addChildrenToList(node, ret);
+        }
+        return ret;
+    }
+
+    public List<Integer> getBoneIdsOfSubTree(String name){
+        List<BoneMFNode> nodeList = getSubTree(name);
+        List<Integer> ret = new ArrayList<>();
+        for (BoneMFNode node : nodeList){
+            ret.add(getBoneId(node.getName()));
+        }
+        return ret;
     }
 
     @Nullable

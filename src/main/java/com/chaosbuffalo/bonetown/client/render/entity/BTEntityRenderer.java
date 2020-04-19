@@ -51,6 +51,10 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         return super.shouldRender(livingEntityIn, camera, camX, camY, camZ);
     }
 
+    public BTModel getModel() {
+        return model;
+    }
+
     @Nullable
     protected RenderType getRenderType(T entityType, boolean isVisible, boolean visibleToPlayer) {
         ResourceLocation resourcelocation = this.getEntityTexture(entityType);

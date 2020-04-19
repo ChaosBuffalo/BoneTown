@@ -24,6 +24,14 @@ public abstract class LayerWithAnimation<T extends Entity & IBTAnimatedEntity<T>
         slots = new HashMap<>();
         setAnimation(animName, BASE_SLOT);
         addMessageCallback(ChangeLayerAnimationMessage.CHANGE_ANIMATION_TYPE, this::consumeChangeAnimation);
+        computeDuration();
+    }
+
+    private void computeDuration(){
+        BakedAnimation anim = getAnimation(BASE_SLOT);
+        if (anim != null){
+            duration = anim.getTotalTicks();
+        }
     }
 
     public void setAnimation(ResourceLocation anim, String slotName){

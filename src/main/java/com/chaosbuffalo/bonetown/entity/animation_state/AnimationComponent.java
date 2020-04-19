@@ -162,6 +162,10 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         return tag;
     }
 
+    public int getTicks() {
+        return ticks;
+    }
+
     public void update() {
         ticks++;
         World world = getEntity().getEntityWorld();
@@ -175,6 +179,10 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
                                 packet, NetworkDirection.PLAY_TO_CLIENT));
                 syncQueue.clear();
             }
+        }
+        AnimationState<T> state = getState(getCurrentState());
+        if (state != null){
+            state.tickState(ticks);
         }
     }
 

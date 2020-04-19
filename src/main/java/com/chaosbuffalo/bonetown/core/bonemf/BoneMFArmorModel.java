@@ -1,5 +1,6 @@
 package com.chaosbuffalo.bonetown.core.bonemf;
 
+import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.model.BakedAnimatedMesh;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.util.ResourceLocation;

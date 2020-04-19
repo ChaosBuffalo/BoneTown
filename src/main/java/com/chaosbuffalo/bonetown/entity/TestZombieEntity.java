@@ -5,14 +5,21 @@ import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationState;
+import com.chaosbuffalo.bonetown.entity.animation_state.layers.FullBodyPoseLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.HeadTrackingLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LocomotionLayer;
+import com.chaosbuffalo.bonetown.entity.animation_state.layers.SubTreePoseLayer;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.EnterStateMessage;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import com.chaosbuffalo.bonetown.init.BTModels;
 import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -24,6 +31,10 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
     BoneMFSkeleton skeleton;
     private static final ResourceLocation IDLE_ANIM = new ResourceLocation(BoneTown.MODID, "biped.idle");
     private static final ResourceLocation RUN_ANIM = new ResourceLocation(BoneTown.MODID, "biped.running");
+    private static final ResourceLocation ZOMBIE_ARMS_ANIM = new ResourceLocation(BoneTown.MODID,
+            "biped.zombie_arms");
+    private static final ResourceLocation BACKFLIP_ANIM = new ResourceLocation(BoneTown.MODID,
+            "biped.backflip");
 
     public TestZombieEntity(final EntityType<? extends TestZombieEntity> type, final World worldIn) {
         super(type, worldIn);
@@ -33,6 +44,16 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         setupAnimationComponent();
     }
 
+    @Override
+    public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
+        if (!getEntityWorld().isRemote()){
+            animationComponent.updateState(new EnterStateMessage("flip"));
+            setNoAI(true);
+            BoneTown.LOGGER.info("In player interact");
+        }
+        return super.applyPlayerInteraction(player, vec, hand);
+    }
+
     protected void setupAnimationComponent() {
         AnimationState<TestZombieEntity> defaultState = new AnimationState<>("default", this);
         HeadTrackingLayer<TestZombieEntity> headTrackingLayer = new HeadTrackingLayer<>("head", this,
@@ -40,10 +61,29 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         LocomotionLayer<TestZombieEntity> locomotionLayer = new LocomotionLayer<>("locomotion",
                 IDLE_ANIM, RUN_ANIM,
                 this, true);
+        SubTreePoseLayer<TestZombieEntity> armsLayer = new SubTreePoseLayer<>("arms",
+                ZOMBIE_ARMS_ANIM, this, true, "bn_chest");
         defaultState.addLayer(locomotionLayer);
+        defaultState.addLayer(armsLayer);
         defaultState.addLayer(headTrackingLayer);
+        locomotionLayer.addEndCallback(() -> {
+            BoneTown.LOGGER.info("In running anim end callback {}", animationComponent.getTicks());
+        });
         animationComponent.addAnimationState(defaultState);
         animationComponent.setState("default");
+        AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this);
+        FullBodyPoseLayer<TestZombieEntity> flipLayer = new FullBodyPoseLayer<>("flip", BACKFLIP_ANIM,
+                this, false);
+        flipState.addLayer(flipLayer);
+        flipLayer.addEndCallback(() -> {
+            BoneTown.LOGGER.info("In flip end callback {}", animationComponent.getTicks());
+            World world = getEntityWorld();
+            if (!world.isRemote()){
+                animationComponent.updateState(new EnterStateMessage("default"));
+                setNoAI(false);
+            }
+        });
+        animationComponent.addAnimationState(flipState);
     }
 
     public TestZombieEntity(World worldIn, double x, double y, double z){

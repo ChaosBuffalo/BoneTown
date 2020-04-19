@@ -95,10 +95,7 @@ public class BTModelRenderData implements IBTRenderDataContainer {
 
     @Override
     public void render(){
-        BoneTown.LOGGER.info("In render {}", this.getClass().toString());
         if (!initialized){
-
-            BoneTown.LOGGER.info("Returning early from render");
             return;
         }
         frameSinceLastRender = 0;

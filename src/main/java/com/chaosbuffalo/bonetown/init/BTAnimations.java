@@ -22,10 +22,14 @@ public class BTAnimations {
                 new ResourceLocation(BoneTown.MODID, "biped.running"),
                 new ResourceLocation(BoneTown.MODID, "biped"),
                 new ResourceLocation(BoneTown.MODID, "biped_running")));
-//        event.getRegistry().register(new BTAdditionalAnimationEntry(
-//                new ResourceLocation(BoneTown.MODID, "biped.swipe"),
-//                new ResourceLocation(BoneTown.MODID, "biped"),
-//                new ResourceLocation(BoneTown.MODID, "biped_swipe")));
+        event.getRegistry().register(new BTAdditionalAnimationEntry(
+                new ResourceLocation(BoneTown.MODID, "biped.zombie_arms"),
+                new ResourceLocation(BoneTown.MODID, "biped"),
+                new ResourceLocation(BoneTown.MODID, "biped_zombie_arms")));
+        event.getRegistry().register(new BTAdditionalAnimationEntry(
+                new ResourceLocation(BoneTown.MODID, "biped.backflip"),
+                new ResourceLocation(BoneTown.MODID, "biped"),
+                new ResourceLocation(BoneTown.MODID, "biped_backflip")));
 
     }
 }

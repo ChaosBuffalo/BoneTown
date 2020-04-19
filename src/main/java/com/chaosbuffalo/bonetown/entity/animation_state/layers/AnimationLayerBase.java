@@ -20,8 +20,10 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity<T>
     private boolean isActive;
     private final T entity;
     private boolean autoStart;
+    protected int duration;
     private final String name;
     private final Map<String, Consumer<AnimationLayerMessage>> messageCallbacks;
+    private Runnable animEndCallback;
 
     public AnimationLayerBase(String name, T entity){
         startTime = 0;
@@ -29,8 +31,20 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity<T>
         this.isValid = entity != null && entity.getSkeleton() != null;
         this.isActive = true;
         this.autoStart = true;
+        this.duration = -1;
         this.messageCallbacks = new HashMap<>();
+        animEndCallback = null;
         this.name = name;
+    }
+
+    @Override
+    public boolean shouldLoop() {
+        return false;
+    }
+
+    @Override
+    public int getDuration() {
+        return duration;
     }
 
     @Override
@@ -47,6 +61,24 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity<T>
         messageCallbacks.put(messageType, consumer);
     }
 
+
+    @Override
+    public void addEndCallback(Runnable callback) {
+        animEndCallback = callback;
+    }
+
+    @Override
+    public void tick(int ticks) {
+        if (getDuration() != -1 && animEndCallback != null){
+            int currentTicks = ticks - getStartTime();
+            if (shouldLoop()){
+                currentTicks = currentTicks % getDuration();
+            }
+            if (currentTicks == getDuration() - 1){
+                animEndCallback.run();
+            }
+        }
+    }
 
     @Override
     public T getEntity() {

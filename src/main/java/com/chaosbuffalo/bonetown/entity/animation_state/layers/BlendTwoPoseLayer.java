@@ -35,6 +35,11 @@ public class BlendTwoPoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends 
         return blendWeight;
     }
 
+    @Override
+    public boolean shouldLoop() {
+        return shouldLoop;
+    }
+
     private void consumeChangeBlendWeight(AnimationLayerMessage message){
         if (message instanceof ChangeBlendWeightMessage){
             ChangeBlendWeightMessage changeMessage = (ChangeBlendWeightMessage) message;
@@ -46,14 +51,12 @@ public class BlendTwoPoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends 
     void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
         BakedAnimation baseAnimation = getAnimation(BASE_SLOT);
         BakedAnimation blendAnimation = getAnimation(SECOND_SLOT);
-        BoneTown.LOGGER.info("Zombie walk blend amount: {}, time: {}", getBlendAmount(),
-                currentTime - getStartTime());
         if (baseAnimation != null && blendAnimation != null){
             BakedAnimation.InterpolationFramesReturn ret = baseAnimation.getInterpolationFrames(
-                    currentTime - getStartTime(), shouldLoop, partialTicks);
+                    currentTime - getStartTime(), shouldLoop(), partialTicks);
             anim1Blend.simpleBlend(ret.current, ret.next, ret.partialTick);
             BakedAnimation.InterpolationFramesReturn ret2 = blendAnimation.getInterpolationFrames(
-                    currentTime - getStartTime(), shouldLoop, partialTicks);
+                    currentTime - getStartTime(), shouldLoop(), partialTicks);
             anim2Blend.simpleBlend(ret2.current, ret2.next, ret2.partialTick);
             finalBlend.simpleBlend(anim1Blend.getPose(), anim2Blend.getPose(), getBlendAmount());
             outPose.copyPose(finalBlend.getPose());
