@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 in  vec2 outTexCoord;
 in vec3 vertex;

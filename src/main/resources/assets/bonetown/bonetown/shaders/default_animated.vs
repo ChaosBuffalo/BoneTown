@@ -1,7 +1,7 @@
-#version 330
+#version 420
 
 const int MAX_WEIGHTS = 4;
-const int MAX_JOINTS = 150;
+const int MAX_JOINTS = 100;
 
 layout (location=0) in vec3 position;
 layout (location=1) in vec2 texCoord;

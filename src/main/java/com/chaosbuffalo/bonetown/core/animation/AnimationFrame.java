@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class AnimationFrame extends Pose {
 
-    public static final int MAX_JOINTS = 150;
+    public static final int MAX_JOINTS = 100;
 
     public static final Matrix4d[] DEFAULT_FRAME = new Matrix4d[MAX_JOINTS];
 
