@@ -1,10 +1,6 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
-import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
-import com.chaosbuffalo.bonetown.core.animation.IPose;
-import com.chaosbuffalo.bonetown.core.animation.LocalSubTreeBlend;
-import com.chaosbuffalo.bonetown.core.animation.WeightedAnimationBlend;
+import com.chaosbuffalo.bonetown.core.animation.*;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import net.minecraft.entity.Entity;
@@ -41,7 +37,7 @@ public class SubTreePoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends L
     void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
         BakedAnimation animation = getAnimation(BASE_SLOT);
         if (animation != null){
-            BakedAnimation.InterpolationFramesReturn ret = animation.getInterpolationFrames(
+            InterpolationFramesReturn ret = animation.getInterpolationFrames(
                     currentTime - getStartTime(), shouldLoop(), partialTicks);
             localBlend.setFrames(ret);
             IPose localPose = localBlend.getPose();

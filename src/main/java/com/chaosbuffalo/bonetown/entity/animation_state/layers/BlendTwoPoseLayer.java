@@ -1,8 +1,8 @@
 package com.chaosbuffalo.bonetown.entity.animation_state.layers;
 
-import com.chaosbuffalo.bonetown.BoneTown;
 import com.chaosbuffalo.bonetown.core.animation.BakedAnimation;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
+import com.chaosbuffalo.bonetown.core.animation.InterpolationFramesReturn;
 import com.chaosbuffalo.bonetown.core.animation.WeightedAnimationBlend;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
@@ -52,10 +52,10 @@ public class BlendTwoPoseLayer<T extends Entity & IBTAnimatedEntity<T>> extends 
         BakedAnimation baseAnimation = getAnimation(BASE_SLOT);
         BakedAnimation blendAnimation = getAnimation(SECOND_SLOT);
         if (baseAnimation != null && blendAnimation != null){
-            BakedAnimation.InterpolationFramesReturn ret = baseAnimation.getInterpolationFrames(
+            InterpolationFramesReturn ret = baseAnimation.getInterpolationFrames(
                     currentTime - getStartTime(), shouldLoop(), partialTicks);
             anim1Blend.simpleBlend(ret.current, ret.next, ret.partialTick);
-            BakedAnimation.InterpolationFramesReturn ret2 = blendAnimation.getInterpolationFrames(
+            InterpolationFramesReturn ret2 = blendAnimation.getInterpolationFrames(
                     currentTime - getStartTime(), shouldLoop(), partialTicks);
             anim2Blend.simpleBlend(ret2.current, ret2.next, ret2.partialTick);
             finalBlend.simpleBlend(anim1Blend.getPose(), anim2Blend.getPose(), getBlendAmount());

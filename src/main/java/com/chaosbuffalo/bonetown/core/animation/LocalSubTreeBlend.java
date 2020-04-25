@@ -1,12 +1,12 @@
 package com.chaosbuffalo.bonetown.core.animation;
 
 import java.util.List;
-import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
+
 import org.joml.Matrix4d;
 
 public class LocalSubTreeBlend implements IPoseProvider {
 
-    private BakedAnimation.InterpolationFramesReturn frames;
+    private InterpolationFramesReturn frames;
     private final Pose workFrame;
     private final List<Integer> boneIds;
 
@@ -17,7 +17,7 @@ public class LocalSubTreeBlend implements IPoseProvider {
 
     }
 
-    public void setFrames(BakedAnimation.InterpolationFramesReturn ret){
+    public void setFrames(InterpolationFramesReturn ret){
         frames = ret;
         workFrame.setJointCount(frames.current.getJointCount());
     }

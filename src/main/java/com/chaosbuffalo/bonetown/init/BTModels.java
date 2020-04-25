@@ -17,21 +17,13 @@ import java.util.Arrays;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 @ObjectHolder(BoneTown.MODID)
 public class BTModels {
-//
     @ObjectHolder("test_cube")
     public static BTModel TEST_CUBE;
 
-//    @ObjectHolder("spider")
-//    public static BTModel SPIDER;
 
     @ObjectHolder("biped")
     public static BTModel BIPED;
 
-    @ObjectHolder("biped_t")
-    public static BTModel BIPED2;
-
-    @ObjectHolder("bone_display")
-    public static BTModel BONE_DISPLAY;
 
     @SuppressWarnings("unused")
     @SubscribeEvent
@@ -40,17 +32,8 @@ public class BTModels {
         event.getRegistry().register(new BTModel(
                 new ResourceLocation(BoneTown.MODID, "test_cube"),
                 BoneTownConstants.MeshTypes.BONEMF));
-//        event.getRegistry().register(new BTAnimatedModel(
-//                new ResourceLocation(BoneTown.MODID, "spider"),
-//                BoneTownConstants.MeshTypes.FBX));
         event.getRegistry().register(new BTAnimatedModel(
                 new ResourceLocation(BoneTown.MODID, "biped"),
-                BoneTownConstants.MeshTypes.BONEMF));
-        event.getRegistry().register(new BTModel(
-                new ResourceLocation(BoneTown.MODID, "biped_t"),
-                BoneTownConstants.MeshTypes.BONEMF));
-        event.getRegistry().register(new BTModel(
-                new ResourceLocation(BoneTown.MODID, "bone_display"),
                 BoneTownConstants.MeshTypes.BONEMF));
     }
 

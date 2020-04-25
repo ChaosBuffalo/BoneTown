@@ -1,10 +1,12 @@
 package com.chaosbuffalo.bonetown.entity;
 
 import com.chaosbuffalo.bonetown.BoneTown;
+import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.entity.animation_state.AnimationState;
+import com.chaosbuffalo.bonetown.entity.animation_state.AnimationUtils;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.FullBodyPoseLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.HeadTrackingLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LocomotionLayer;
@@ -12,13 +14,13 @@ import com.chaosbuffalo.bonetown.entity.animation_state.layers.SubTreePoseLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.EnterStateMessage;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import com.chaosbuffalo.bonetown.init.BTModels;
-import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -45,11 +47,16 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
     }
 
     @Override
+    public AxisAlignedBB getBoundingBox() {
+        return getAnimationComponent().applyRootMotionToBoundingBox(super.getBoundingBox());
+    }
+
+
+    @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
         if (!getEntityWorld().isRemote()){
             animationComponent.updateState(new EnterStateMessage("flip"));
             setNoAI(true);
-            BoneTown.LOGGER.info("In player interact");
         }
         return super.applyPlayerInteraction(player, vec, hand);
     }
@@ -66,17 +73,22 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         defaultState.addLayer(locomotionLayer);
         defaultState.addLayer(armsLayer);
         defaultState.addLayer(headTrackingLayer);
-        locomotionLayer.addEndCallback(() -> {
-            BoneTown.LOGGER.info("In running anim end callback {}", animationComponent.getTicks());
-        });
         animationComponent.addAnimationState(defaultState);
         animationComponent.setState("default");
-        AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this);
+        AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this, boundingBox -> {
+            IPose pose = getAnimationComponent().getCurrentPose();
+            AxisAlignedBB poseBox = AnimationUtils.GetBBoxForPose(pose);
+            double diff = 1.75 - (poseBox.maxY - poseBox.minY);
+            if (diff > 0){
+                return boundingBox.contract(0.0, diff / 2.0, 0.0).contract(0.0, -diff / 2.0, 0.0);
+            } else {
+                return boundingBox;
+            }
+        });
         FullBodyPoseLayer<TestZombieEntity> flipLayer = new FullBodyPoseLayer<>("flip", BACKFLIP_ANIM,
                 this, false);
         flipState.addLayer(flipLayer);
         flipLayer.addEndCallback(() -> {
-            BoneTown.LOGGER.info("In flip end callback {}", animationComponent.getTicks());
             World world = getEntityWorld();
             if (!world.isRemote()){
                 animationComponent.updateState(new EnterStateMessage("default"));

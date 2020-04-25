@@ -51,7 +51,8 @@ public class AnimatedHeldItemLayer<T extends LivingEntity & IBTAnimatedEntity<T>
             BTAnimatedEntityRenderer<T> renderer = getEntityRenderer();
             String boneName = isLeftHand ? entity.getLeftHandBoneName() : entity.getRightHandBoneName();
             renderer.moveMatrixStackToBone(entity, boneName, matrixStack, pose);
-            matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F));
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0f));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
             Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, itemStack, cameraTransform,
                     isLeftHand, matrixStack, bufferIn, packedLight);
             matrixStack.pop();

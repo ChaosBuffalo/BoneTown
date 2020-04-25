@@ -10,10 +10,12 @@ import com.chaosbuffalo.bonetown.network.EntityAnimationClientUpdatePacket;
 import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
+import org.joml.Vector3d;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -96,8 +98,8 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     }
 
     public void setState(String stateName){
-        if (!getCurrentState().equals(INVALID_STATE)){
-            AnimationState<T> state = getState(getCurrentState());
+        if (!getCurrentStateName().equals(INVALID_STATE)){
+            AnimationState<T> state = getState(getCurrentStateName());
             if (state != null){
                 state.leaveState();
             }
@@ -124,11 +126,11 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         if (isSamePose(partialTicks)){
             return workFrame;
         }
-        if (getCurrentState().equals(INVALID_STATE)){
+        if (getCurrentStateName().equals(INVALID_STATE)){
             BoneTown.LOGGER.warn("Animation for entity: {} currently in invalid state", getEntity().toString());
             return DEFAULT_FRAME;
         }
-        AnimationState<T> state = getState(getCurrentState());
+        AnimationState<T> state = getState(getCurrentStateName());
         if (state != null){
             state.applyToPose(ticks, partialTicks, workFrame);
             lastPoseFetch = ticks;
@@ -136,13 +138,24 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
             return workFrame;
         } else {
             BoneTown.LOGGER.warn("Animation for entity: {} state not found: {}",
-                    getEntity().toString(), getCurrentState());
+                    getEntity().toString(), getCurrentStateName());
             return DEFAULT_FRAME;
         }
     }
 
-    public String getCurrentState() {
+    public String getCurrentStateName() {
         return currentState;
+    }
+
+    public AnimationState<T> getCurrentState(){
+        return getState(getCurrentStateName());
+    }
+
+    public AxisAlignedBB applyRootMotionToBoundingBox(AxisAlignedBB boundingBox){
+        IPose pose = getCurrentPose();
+        Vector3d rootPos = AnimationUtils.getTranslationComponent(pose.getJointMatrix(0));
+        return getCurrentState().applyStateToBoundingBox(boundingBox)
+                .offset(rootPos.x(), rootPos.y(), rootPos.z());
     }
 
 
@@ -158,7 +171,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT tag = new CompoundNBT();
-        tag.putString("current_state", getCurrentState());
+        tag.putString("current_state", getCurrentStateName());
         return tag;
     }
 
@@ -180,7 +193,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
                 syncQueue.clear();
             }
         }
-        AnimationState<T> state = getState(getCurrentState());
+        AnimationState<T> state = getState(getCurrentStateName());
         if (state != null){
             state.tickState(ticks);
         }

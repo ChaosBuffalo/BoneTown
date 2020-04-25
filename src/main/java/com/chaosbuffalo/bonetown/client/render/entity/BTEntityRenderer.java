@@ -2,7 +2,6 @@ package com.chaosbuffalo.bonetown.client.render.entity;
 
 
 import com.chaosbuffalo.bonetown.client.render.RenderDataManager;
-import com.chaosbuffalo.bonetown.client.render.render_data.BTModelRenderData;
 import com.chaosbuffalo.bonetown.client.render.render_data.IBTRenderDataContainer;
 import com.chaosbuffalo.bonetown.core.model.BTModel;
 import com.chaosbuffalo.bonetown.core.materials.MaterialResourceManager;

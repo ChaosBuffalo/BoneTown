@@ -17,7 +17,7 @@ public class RenderDataManager {
 
     private final HashMap<RenderDataKey, IBTRenderDataContainer> renderData;
 
-    public static final int FRAMES_BEFORE_CLEANUP = 6000;
+    public static final int FRAMES_BEFORE_CLEANUP = 60000;
 
     private class RenderDataKey {
         private ResourceLocation modelName;

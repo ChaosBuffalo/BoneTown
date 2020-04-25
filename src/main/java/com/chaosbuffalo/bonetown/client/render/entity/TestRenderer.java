@@ -13,10 +13,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class TestRenderer extends BTEntityRenderer<TestEntity> {
 
     public static final ResourceLocation TEST_TEXTURE = new ResourceLocation(BoneTown.MODID,
-            "bonetown/textures/zombie.png");
+            "bonetown/textures/test_cube.png");
 
     public TestRenderer(final EntityRendererManager manager) {
-        super(manager, BTModels.BIPED2);
+        super(manager, BTModels.TEST_CUBE);
         BoneTown.LOGGER.info("Creating test renderer");
     }
 

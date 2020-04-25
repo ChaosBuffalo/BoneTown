@@ -1,9 +1,6 @@
 package com.chaosbuffalo.bonetown;
 
-import com.chaosbuffalo.bonetown.client.render.entity.DebugBoneRenderer;
-import com.chaosbuffalo.bonetown.client.render.entity.TestAnimatedRenderer;
-import com.chaosbuffalo.bonetown.client.render.entity.TestRenderer;
-import com.chaosbuffalo.bonetown.client.render.entity.TestZombieRenderer;
+
 import com.chaosbuffalo.bonetown.core.BoneTownRegistry;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.core.model.BTAnimatedModel;
@@ -11,9 +8,9 @@ import com.chaosbuffalo.bonetown.core.proxy.ClientProxy;
 import com.chaosbuffalo.bonetown.core.proxy.IBTProxy;
 import com.chaosbuffalo.bonetown.core.proxy.ServerProxy;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
+import com.chaosbuffalo.bonetown.init.BTRenderers;
 import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,7 +30,7 @@ public class BoneTown
         proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
         proxy.registerHandlers();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
         BTEntityTypes.ENTITY_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
@@ -52,20 +49,7 @@ public class BoneTown
         });
     }
 
-    private void doClientStuff(final FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(
-                BTEntityTypes.TEST_ENTITY.get(),
-                TestRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(
-                BTEntityTypes.TEST_ANIMATED_ENTITY.get(),
-                TestAnimatedRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(
-                BTEntityTypes.DEBUG_BONE_ENTITY.get(),
-                DebugBoneRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(
-                BTEntityTypes.TEST_ZOMBIE.get(),
-                TestZombieRenderer::new
-        );
-        LOGGER.debug("Registered Entity Renderers");
+    private void clientSetup(final FMLClientSetupEvent event) {
+        BTRenderers.registerRenderers();
     }
 }

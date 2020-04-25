@@ -10,7 +10,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerHandlers() {
         super.registerHandlers();
-        BoneTown.LOGGER.info("Registering client handlers");
         ((IReloadableResourceManager) Minecraft.getInstance().getResourceManager())
                 .addReloadListener(MaterialResourceManager.INSTANCE);
     }

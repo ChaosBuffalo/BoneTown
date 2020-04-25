@@ -1,16 +1,17 @@
 package com.chaosbuffalo.bonetown.entity.animation_state;
 
 import com.chaosbuffalo.bonetown.BoneTown;
-import com.chaosbuffalo.bonetown.core.animation.AnimationFrame;
 import com.chaosbuffalo.bonetown.core.animation.IPose;
 import com.chaosbuffalo.bonetown.core.bonemf.BoneMFSkeleton;
 import com.chaosbuffalo.bonetown.entity.IBTAnimatedEntity;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.IAnimationLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.messages.layer.AnimationLayerMessage;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.AxisAlignedBB;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
 
 public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
 
@@ -19,6 +20,7 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
     private final T entity;
     private final BoneMFSkeleton skeleton;
     private final String name;
+    private Function<AxisAlignedBB, AxisAlignedBB> bboxModifier;
 
     public AnimationState(String name, T entity){
         this.name = name;
@@ -31,6 +33,11 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
         }
     }
 
+    public AnimationState(String name, T entity, Function<AxisAlignedBB, AxisAlignedBB> bboxModifier){
+        this(name, entity);
+        this.bboxModifier = bboxModifier;
+    }
+
     public String getName() {
         return name;
     }
@@ -40,6 +47,14 @@ public class AnimationState<T extends Entity & IBTAnimatedEntity<T>> {
             if (layer.shouldRun()){
                 layer.tick(currentTicks);
             }
+        }
+    }
+
+    public AxisAlignedBB applyStateToBoundingBox(AxisAlignedBB boundingBox){
+        if (bboxModifier != null){
+            return bboxModifier.apply(boundingBox);
+        } else {
+            return boundingBox;
         }
     }
 

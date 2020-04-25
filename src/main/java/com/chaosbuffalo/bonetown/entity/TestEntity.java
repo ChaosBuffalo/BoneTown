@@ -15,7 +15,6 @@ public class TestEntity extends Entity {
     public TestEntity(final EntityType<? extends TestEntity> entityType, final World world) {
         super(entityType, world);
         setBoundingBox(new AxisAlignedBB(-1D, -1D, -1.0D, 1.0D, 1.0D, 1.0D));
-        BoneTown.LOGGER.info("Creating test entity");
         ignoreFrustumCheck = true;
     }
 
@@ -44,7 +43,6 @@ public class TestEntity extends Entity {
 
     @Override
     public IPacket<?> createSpawnPacket() {
-        BoneTown.LOGGER.info("Creating spawn packet {}", this.getPosition().toString());
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

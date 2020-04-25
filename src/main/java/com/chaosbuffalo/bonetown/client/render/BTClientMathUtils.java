@@ -21,8 +21,8 @@ public class BTClientMathUtils {
         Vector3d scale = new Vector3d();
         inMat.getScale(scale);
         Quaternion mcQuat = new Quaternion((float) quat.x(), (float) quat.y(), (float) quat.z(), (float)quat.w());
-        inStack.rotate(mcQuat);
         inStack.translate(translation.x(), translation.y(), translation.z());
+        inStack.rotate(mcQuat);
         inStack.scale((float) scale.x(), (float) scale.y(), (float) scale.z());
     }
 

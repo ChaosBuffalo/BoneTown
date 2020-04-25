@@ -29,7 +29,6 @@ public class MaterialResourceManager implements ISelectiveResourceReloadListener
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
-        BoneTown.LOGGER.info("In resource manager reload for shader manager");
         if (resourcePredicate.test(getResourceType()))
         {
             clearProgramCache();
@@ -55,7 +54,6 @@ public class MaterialResourceManager implements ISelectiveResourceReloadListener
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
-        BoneTown.LOGGER.info("Reloading Shaders");
         this.manager = resourceManager;
         for (BTMaterialEntry entry : BoneTownRegistry.MATERIAL_REGISTRY.getValues()){
             loadProgram(entry);

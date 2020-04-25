@@ -1,7 +1,6 @@
 package com.chaosbuffalo.bonetown.core.animation;
 
 
-import com.chaosbuffalo.bonetown.BoneTown;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
@@ -15,21 +14,6 @@ public class BakedAnimation {
     private double ticksPerSecond;
 
     private int frameCount;
-
-    public static class InterpolationFramesReturn {
-
-        public AnimationFrame current;
-        public AnimationFrame next;
-        public float partialTick;
-
-        public InterpolationFramesReturn(AnimationFrame current,
-                                         AnimationFrame next,
-                                         float partialTick){
-            this.current = current;
-            this.next = next;
-            this.partialTick = partialTick;
-        }
-    }
 
     public BakedAnimation(ResourceLocation name, List<AnimationFrame> frames, double ticksPerSecond) {
         this.name = name;

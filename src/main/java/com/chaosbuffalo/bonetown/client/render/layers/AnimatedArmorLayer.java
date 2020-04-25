@@ -54,6 +54,7 @@ public class AnimatedArmorLayer<T extends LivingEntity & IBTAnimatedEntity<T>> e
         if (itemStack.getItem() instanceof ArmorItem) {
             ArmorItem armorItem = (ArmorItem) itemStack.getItem();
             model.getBakedArmorForMaterial(armorItem.getArmorMaterial()).ifPresent((meshes) -> {
+                matrixStack.push();
                 BTArmorRenderData renderData = RenderDataManager.MANAGER.getArmorRenderDataForModel(meshes);
                 ResourceLocation armorResource = getArmorResource(entityIn, itemStack, slot, null);
                 RenderType renderType = RenderType.entityCutoutNoCull(armorResource);
@@ -64,6 +65,7 @@ public class AnimatedArmorLayer<T extends LivingEntity & IBTAnimatedEntity<T>> e
                 }
                 renderData.renderSlot(slot);
                 material.endRender(renderType);
+                matrixStack.pop();
             });
         }
 
