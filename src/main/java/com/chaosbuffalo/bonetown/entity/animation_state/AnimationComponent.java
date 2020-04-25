@@ -10,8 +10,12 @@ import com.chaosbuffalo.bonetown.network.EntityAnimationClientUpdatePacket;
 import com.chaosbuffalo.bonetown.network.PacketHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -30,8 +34,8 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     private static final Pose DEFAULT_FRAME = new Pose();
     private int lastPoseFetch;
     private float lastPartialTicks;
-    private String currentState;
     public static final String INVALID_STATE = "invalid";
+    public final Stack<String> stateStack;
 
     private final List<AnimationMessage> syncQueue;
 
@@ -45,6 +49,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         this.entity = entity;
         ticks = 0;
         this.syncQueue = new ArrayList<>();
+        this.stateStack = new Stack<>();
         animationStates = new HashMap<>();
         workFrame = new Pose();
         if (entity.getSkeleton() != null){
@@ -52,7 +57,6 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         }
         lastPoseFetch = -1;
         lastPartialTicks = 0;
-        currentState = INVALID_STATE;
     }
 
     public void addAnimationState(AnimationState<T> animState){
@@ -97,21 +101,43 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         }
     }
 
-    public void setState(String stateName){
+    public void pushState(String stateName){
         if (!getCurrentStateName().equals(INVALID_STATE)){
             AnimationState<T> state = getState(getCurrentStateName());
             if (state != null){
                 state.leaveState();
             }
         }
+
         AnimationState<T> newState = getState(stateName);
         if (newState != null){
-            currentState = stateName;
+            stateStack.push(stateName);
             newState.enterState(ticks);
         } else {
-            currentState = INVALID_STATE;
+            stateStack.push(INVALID_STATE);
         }
     }
+
+    public void popState(){
+        if (!getCurrentStateName().equals(INVALID_STATE)){
+            AnimationState<T> state = getCurrentState();
+            if (state != null){
+                state.leaveState();
+            }
+        }
+        stateStack.pop();
+        String newState = getCurrentStateName();
+        if (!newState.equals(INVALID_STATE)){
+            AnimationState<T> state = getState(newState);
+            if (state != null){
+                state.enterState(ticks);
+            } else {
+                stateStack.pop();
+                stateStack.push(INVALID_STATE);
+            }
+        }
+    }
+
 
     protected boolean isSamePose(float partialTicks){
         return ticks == lastPoseFetch && partialTicks == lastPartialTicks;
@@ -144,7 +170,10 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     }
 
     public String getCurrentStateName() {
-        return currentState;
+        if (stateStack.empty()){
+            return INVALID_STATE;
+        }
+        return stateStack.peek();
     }
 
     public AnimationState<T> getCurrentState(){
@@ -168,12 +197,6 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         return entity;
     }
 
-    @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT tag = new CompoundNBT();
-        tag.putString("current_state", getCurrentStateName());
-        return tag;
-    }
 
     public int getTicks() {
         return ticks;
@@ -200,11 +223,25 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
     }
 
     @Override
+    public CompoundNBT serializeNBT() {
+        CompoundNBT tag = new CompoundNBT();
+        ListNBT stack = new ListNBT();
+        stateStack.forEach((stateName) -> {
+            stack.add(StringNBT.valueOf(stateName));
+        });
+        tag.put("stateStack", stack);
+        return tag;
+    }
+
+    @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains("current_state")){
-            currentState = nbt.getString("current_state");
-        } else {
-            currentState = INVALID_STATE;
+        if (nbt.contains("stateStack")){
+            stateStack.clear();
+            ListNBT stack = nbt.getList("stateStack", Constants.NBT.TAG_STRING);
+            stack.forEach(tag -> {
+                String stateName = tag.getString();
+                stateStack.push(stateName);
+            });
         }
 
     }

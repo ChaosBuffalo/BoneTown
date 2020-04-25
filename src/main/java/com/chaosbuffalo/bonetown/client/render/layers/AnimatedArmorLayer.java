@@ -57,7 +57,7 @@ public class AnimatedArmorLayer<T extends LivingEntity & IBTAnimatedEntity<T>> e
                 matrixStack.push();
                 BTArmorRenderData renderData = RenderDataManager.MANAGER.getArmorRenderDataForModel(meshes);
                 ResourceLocation armorResource = getArmorResource(entityIn, itemStack, slot, null);
-                RenderType renderType = RenderType.entityCutoutNoCull(armorResource);
+                RenderType renderType = RenderType.getEntityCutoutNoCull(armorResource);
                 int packedOverlay = LivingRenderer.getPackedOverlay(entityIn, partialTicks);
                 material.initRender(renderType, matrixStack, projectionMatrix, packedLight, packedOverlay);
                 if (!renderData.isInitialized()){

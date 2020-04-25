@@ -37,7 +37,6 @@ public class AnimationUtils {
             }
         }
         AxisAlignedBB result = new AxisAlignedBB(lowestX, lowestY, lowestZ, highestX, highestY, highestZ);
-        BoneTown.LOGGER.info("Result for bbox = {}", result.toString());
         return result;
     }
 

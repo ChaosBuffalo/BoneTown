@@ -29,7 +29,7 @@ public interface IAnimationLayer<T extends Entity & IBTAnimatedEntity> {
 
     int getDuration();
 
-    void addEndCallback(Runnable callback);
+    void setEndCallback(Runnable callback);
 
     void consumeLayerMessage(AnimationLayerMessage message);
 

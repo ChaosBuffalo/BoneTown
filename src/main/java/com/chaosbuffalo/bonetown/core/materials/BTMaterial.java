@@ -63,12 +63,12 @@ public class BTMaterial implements IBTMaterial {
                            int packedLight, int packedOverlay){
 
         this.useProgram();
-        renderType.enable();
+        renderType.setupRenderState();
         if (this.firstUpload){
             initStaticValues();
             this.firstUpload = false;
         }
-        this.uploadModelViewMatrix(matrixStackIn.getLast().getPositionMatrix());
+        this.uploadModelViewMatrix(matrixStackIn.getLast().getMatrix());
         this.uploadProjectionMatrix(projection);
         this.uploadPackedLightMap(packedLight);
         this.uploadPackedOverlay(packedOverlay);
@@ -85,7 +85,7 @@ public class BTMaterial implements IBTMaterial {
 
     @Override
     public void endRender(RenderType renderType){
-        renderType.disable();
+        renderType.clearRenderState();
         this.releaseProgram();
     }
 
@@ -150,9 +150,9 @@ public class BTMaterial implements IBTMaterial {
 
     public void receiveLightingInfo(MatrixStack lightingStack){
         Vector4f diffuse0Loc = new Vector4f(GlobalRenderInfo.DIFFUSE_LIGHT_0);
-        diffuse0Loc.transform(lightingStack.getLast().getPositionMatrix());
+        diffuse0Loc.transform(lightingStack.getLast().getMatrix());
         Vector4f diffuse1Loc = new Vector4f(GlobalRenderInfo.DIFFUSE_LIGHT_1);
-        diffuse1Loc.transform(lightingStack.getLast().getPositionMatrix());
+        diffuse1Loc.transform(lightingStack.getLast().getMatrix());
 
         diffuseLocs.set(diffuse0Loc.getX(), diffuse0Loc.getY(), diffuse0Loc.getZ(),
                 diffuse1Loc.getX(), diffuse1Loc.getY(), diffuse1Loc.getZ());

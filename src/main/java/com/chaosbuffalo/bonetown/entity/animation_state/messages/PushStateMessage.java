@@ -4,25 +4,25 @@ import com.chaosbuffalo.bonetown.entity.animation_state.AnimationComponent;
 import com.chaosbuffalo.bonetown.network.NetworkDeserializers;
 import net.minecraft.network.PacketBuffer;
 
-public class EnterStateMessage extends AnimationMessage {
+public class PushStateMessage extends AnimationMessage {
     private String stateName;
-    public static final String ENTER_STATE = "ENTER_STATE";
+    public static final String PUSH_STATE = "PUSH_STATE";
 
     static {
-        NetworkDeserializers.animationMessageDeserializer.addNetworkDeserializer(ENTER_STATE,
-                EnterStateMessage::fromPacketBuffer);
-        AnimationComponent.addMessageHandler(ENTER_STATE, EnterStateMessage::handleMessage);
+        NetworkDeserializers.animationMessageDeserializer.addNetworkDeserializer(PUSH_STATE,
+                PushStateMessage::fromPacketBuffer);
+        AnimationComponent.addMessageHandler(PUSH_STATE, PushStateMessage::handleMessage);
     }
 
     private static void handleMessage(AnimationComponent<?> component, AnimationMessage message){
-        if (message instanceof EnterStateMessage){
-            component.setState(((EnterStateMessage) message).getStateName());
+        if (message instanceof PushStateMessage){
+            component.pushState(((PushStateMessage) message).getStateName());
         }
     }
 
-    private static EnterStateMessage fromPacketBuffer(PacketBuffer buffer){
+    private static PushStateMessage fromPacketBuffer(PacketBuffer buffer){
         String stateName = buffer.readString();
-        return new EnterStateMessage(stateName);
+        return new PushStateMessage(stateName);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class EnterStateMessage extends AnimationMessage {
         buffer.writeString(getStateName());
     }
 
-    public EnterStateMessage(String stateName) {
-        super(ENTER_STATE);
+    public PushStateMessage(String stateName) {
+        super(PUSH_STATE);
         this.stateName = stateName;
     }
 

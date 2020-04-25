@@ -58,11 +58,11 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
     protected RenderType getRenderType(T entityType, boolean isVisible, boolean visibleToPlayer) {
         ResourceLocation resourcelocation = this.getEntityTexture(entityType);
         if (visibleToPlayer) {
-            return RenderType.entityTranslucent(resourcelocation);
+            return RenderType.getEntityTranslucent(resourcelocation);
         } else if (isVisible) {
-            return RenderType.entityCutoutNoCull(resourcelocation);
+            return RenderType.getEntityCutoutNoCull(resourcelocation);
         } else {
-            return entityType.isGlowing() ? RenderType.outline(resourcelocation) : null;
+            return entityType.isGlowing() ? RenderType.getOutline(resourcelocation) : null;
         }
     }
 
@@ -104,7 +104,7 @@ public abstract class BTEntityRenderer<T extends Entity> extends EntityRenderer<
         if (entityIn instanceof LivingEntity){
             packedOverlay = LivingRenderer.getPackedOverlay((LivingEntity) entityIn, partialTicks);
         } else {
-            packedOverlay = OverlayTexture.DEFAULT_LIGHT;
+            packedOverlay = OverlayTexture.NO_OVERLAY;
         }
         drawModel(rendertype, entityIn,
                 entityYaw, partialTicks, matrixStackIn,

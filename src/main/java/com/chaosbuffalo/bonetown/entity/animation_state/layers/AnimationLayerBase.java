@@ -61,9 +61,8 @@ public abstract class AnimationLayerBase<T extends Entity & IBTAnimatedEntity<T>
         messageCallbacks.put(messageType, consumer);
     }
 
-
     @Override
-    public void addEndCallback(Runnable callback) {
+    public void setEndCallback(Runnable callback) {
         animEndCallback = callback;
     }
 

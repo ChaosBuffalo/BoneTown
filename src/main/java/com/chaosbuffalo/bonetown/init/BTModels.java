@@ -20,10 +20,8 @@ public class BTModels {
     @ObjectHolder("test_cube")
     public static BTModel TEST_CUBE;
 
-
     @ObjectHolder("biped")
     public static BTModel BIPED;
-
 
     @SuppressWarnings("unused")
     @SubscribeEvent

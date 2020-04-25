@@ -11,7 +11,8 @@ import com.chaosbuffalo.bonetown.entity.animation_state.layers.FullBodyPoseLayer
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.HeadTrackingLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.LocomotionLayer;
 import com.chaosbuffalo.bonetown.entity.animation_state.layers.SubTreePoseLayer;
-import com.chaosbuffalo.bonetown.entity.animation_state.messages.EnterStateMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.PopStateMessage;
+import com.chaosbuffalo.bonetown.entity.animation_state.messages.PushStateMessage;
 import com.chaosbuffalo.bonetown.init.BTEntityTypes;
 import com.chaosbuffalo.bonetown.init.BTModels;
 import net.minecraft.entity.EntityType;
@@ -54,8 +55,8 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
 
     @Override
     public ActionResultType applyPlayerInteraction(PlayerEntity player, Vec3d vec, Hand hand) {
-        if (!getEntityWorld().isRemote()){
-            animationComponent.updateState(new EnterStateMessage("flip"));
+        if (!getEntityWorld().isRemote() && hand.equals(player.getActiveHand())){
+            animationComponent.updateState(new PushStateMessage("flip"));
             setNoAI(true);
         }
         return super.applyPlayerInteraction(player, vec, hand);
@@ -74,7 +75,7 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         defaultState.addLayer(armsLayer);
         defaultState.addLayer(headTrackingLayer);
         animationComponent.addAnimationState(defaultState);
-        animationComponent.setState("default");
+        animationComponent.pushState("default");
         AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this, boundingBox -> {
             IPose pose = getAnimationComponent().getCurrentPose();
             AxisAlignedBB poseBox = AnimationUtils.GetBBoxForPose(pose);
@@ -88,10 +89,10 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         FullBodyPoseLayer<TestZombieEntity> flipLayer = new FullBodyPoseLayer<>("flip", BACKFLIP_ANIM,
                 this, false);
         flipState.addLayer(flipLayer);
-        flipLayer.addEndCallback(() -> {
+        flipLayer.setEndCallback(() -> {
             World world = getEntityWorld();
             if (!world.isRemote()){
-                animationComponent.updateState(new EnterStateMessage("default"));
+                animationComponent.updateState(new PopStateMessage());
                 setNoAI(false);
             }
         });

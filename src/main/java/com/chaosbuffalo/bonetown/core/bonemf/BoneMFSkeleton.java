@@ -19,7 +19,6 @@ public class BoneMFSkeleton {
     private final BoneMFNode root;
     private final Map<ResourceLocation, BoneMFAnimation> animations;
     private final Map<ResourceLocation, BakedAnimation> bakedAnimations;
-    private final Map<String, Matrix4d> boneInversions;
     private final Pose inverseBindPose;
     private final Pose bindPose;
 
@@ -28,7 +27,6 @@ public class BoneMFSkeleton {
         boneIndex = new HashMap<>();
         boneArrayIndex = new HashMap<>();
         boneParentArrayIndex = new HashMap<>();
-        boneInversions = new HashMap<>();
         boneIdParentIdIndex = new HashMap<>();
         boneArray = root.getNodesOfType(BoneMFAttribute.AttributeTypes.SKELETON);
         animations = new HashMap<>();
@@ -49,7 +47,6 @@ public class BoneMFSkeleton {
             }
             Matrix4d bindPoseMat = new Matrix4d(node.calculateGlobalTransform());
             Matrix4d invertedBindPose = new Matrix4d(bindPoseMat).invertAffine();
-            boneInversions.put(node.getName(), invertedBindPose);
             bindPose.setJointMatrix(count, bindPoseMat);
             inverseBindPose.setJointMatrix(count, invertedBindPose);
             count++;
