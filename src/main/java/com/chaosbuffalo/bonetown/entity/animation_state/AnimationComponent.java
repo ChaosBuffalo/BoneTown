@@ -180,13 +180,6 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
         return getState(getCurrentStateName());
     }
 
-    public AxisAlignedBB applyRootMotionToBoundingBox(AxisAlignedBB boundingBox){
-        IPose pose = getCurrentPose();
-        Vector3d rootPos = AnimationUtils.getTranslationComponent(pose.getJointMatrix(0));
-        return getCurrentState().applyStateToBoundingBox(boundingBox)
-                .offset(rootPos.x(), rootPos.y(), rootPos.z());
-    }
-
 
     @Nullable
     public AnimationState<T> getState(String state){
@@ -242,9 +235,7 @@ public class AnimationComponent<T extends Entity & IBTAnimatedEntity<T>> impleme
                 String stateName = tag.getString();
                 stateStack.push(stateName);
             });
+            pushState(stateStack.pop());
         }
-
     }
-
-
 }

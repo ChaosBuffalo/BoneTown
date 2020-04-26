@@ -161,7 +161,6 @@ public class BoneMFModelLoader {
         mfNode.setScalingOffset(parseVector(node.get("scalingOffset")));
         mfNode.setScalingPivot(parseVector(node.get("scalingPivot")));
         mfNode.setTranslation(parseVector(node.get("translation")));
-//        mfNode.setGlobalTransform(parseMatrix(node.get("global")));
 
         CBORObject attributes = node.get("attributes");
         if (!attributes.isNull()){
@@ -178,7 +177,6 @@ public class BoneMFModelLoader {
                 mfNode.addChild(childNode);
             }
         }
-//        BoneTown.LOGGER.info(mfNode.toString());
         return mfNode;
     }
 

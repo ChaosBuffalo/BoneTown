@@ -32,12 +32,14 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
     private AnimationComponent<TestZombieEntity> animationComponent;
     BTAnimatedModel animatedModel;
     BoneMFSkeleton skeleton;
-    private static final ResourceLocation IDLE_ANIM = new ResourceLocation(BoneTown.MODID, "biped.idle");
-    private static final ResourceLocation RUN_ANIM = new ResourceLocation(BoneTown.MODID, "biped.running");
-    private static final ResourceLocation ZOMBIE_ARMS_ANIM = new ResourceLocation(BoneTown.MODID,
-            "biped.zombie_arms");
-    private static final ResourceLocation BACKFLIP_ANIM = new ResourceLocation(BoneTown.MODID,
-            "biped.backflip");
+    private static final ResourceLocation IDLE_ANIM = new ResourceLocation(
+            BoneTown.MODID, "biped.idle");
+    private static final ResourceLocation RUN_ANIM = new ResourceLocation(
+            BoneTown.MODID, "biped.running");
+    private static final ResourceLocation ZOMBIE_ARMS_ANIM = new ResourceLocation(
+            BoneTown.MODID, "biped.zombie_arms");
+    private static final ResourceLocation BACKFLIP_ANIM = new ResourceLocation(
+            BoneTown.MODID, "biped.backflip");
 
     public TestZombieEntity(final EntityType<? extends TestZombieEntity> type, final World worldIn) {
         super(type, worldIn);
@@ -45,11 +47,6 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         skeleton = animatedModel.getSkeleton().orElse(null);
         animationComponent = new AnimationComponent<>(this);
         setupAnimationComponent();
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox() {
-        return getAnimationComponent().applyRootMotionToBoundingBox(super.getBoundingBox());
     }
 
 
@@ -76,16 +73,7 @@ public class TestZombieEntity extends ZombieEntity implements IBTAnimatedEntity<
         defaultState.addLayer(headTrackingLayer);
         animationComponent.addAnimationState(defaultState);
         animationComponent.pushState("default");
-        AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this, boundingBox -> {
-            IPose pose = getAnimationComponent().getCurrentPose();
-            AxisAlignedBB poseBox = AnimationUtils.GetBBoxForPose(pose);
-            double diff = 1.75 - (poseBox.maxY - poseBox.minY);
-            if (diff > 0){
-                return boundingBox.contract(0.0, diff / 2.0, 0.0).contract(0.0, -diff / 2.0, 0.0);
-            } else {
-                return boundingBox;
-            }
-        });
+        AnimationState<TestZombieEntity> flipState = new AnimationState<>("flip", this);
         FullBodyPoseLayer<TestZombieEntity> flipLayer = new FullBodyPoseLayer<>("flip", BACKFLIP_ANIM,
                 this, false);
         flipState.addLayer(flipLayer);

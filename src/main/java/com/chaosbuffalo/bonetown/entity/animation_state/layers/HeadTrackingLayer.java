@@ -54,12 +54,12 @@ public class HeadTrackingLayer<T extends LivingEntity & IBTAnimatedEntity<T>> ex
                         livingentity.renderYawOffset);
                 netHeadYaw = headYaw - bodyYaw;
                 float wrapped = MathHelper.wrapDegrees(netHeadYaw);
-                if (wrapped < -rotLimit) {
-                    wrapped = -rotLimit;
+                if (wrapped < -getRotLimit()) {
+                    wrapped = -getRotLimit();
                 }
 
-                if (wrapped >= rotLimit) {
-                    wrapped = rotLimit;
+                if (wrapped >= getRotLimit()) {
+                    wrapped = getRotLimit();
                 }
 
                 bodyYaw = headYaw - wrapped;
