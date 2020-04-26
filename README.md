@@ -198,3 +198,183 @@ This should typically be the default armor added to your model. You can then int
 models on a per-armor-material basis if your armor does not use the vanilla UV mapping or you want
 additional geometry. Armor models should be rigged to the same skeleton as the model they are
 intended for.
+
+
+### The Animation Component
+
+AnimationComponent serves as the holder of animation state for your entity in BoneTown. It is
+responsible for assembling the final animation for a frame and syncing state changes over the
+network. AnimationComponent holds a stack of AnimationStates which hold the actual details
+about assembling the animation for the current frame. An AnimationState can be made up of
+multiple layers, these layers could pull data from animation files, from blends of those assets,
+or be procedurally generated such as the equivalent of Minecraft's vanilla head tracking.
+
+Let's take a look at emulating the basic zombie walk, head look, and zombie arm behavior.
+The default AnimationState for our TestZombieEntity is assembled like so:
+
+```java
+    protected void setupAnimationComponent() {
+        AnimationState<TestZombieEntity> defaultState = new AnimationState<>("default", this);
+        HeadTrackingLayer<TestZombieEntity> headTrackingLayer = new HeadTrackingLayer<>("head", this,
+                "bn_head");
+        LocomotionLayer<TestZombieEntity> locomotionLayer = new LocomotionLayer<>("locomotion",
+                IDLE_ANIM, RUN_ANIM,
+                this, true);
+        SubTreePoseLayer<TestZombieEntity> armsLayer = new SubTreePoseLayer<>("arms",
+                ZOMBIE_ARMS_ANIM, this, true, "bn_chest");
+        defaultState.addLayer(locomotionLayer);
+        defaultState.addLayer(armsLayer);
+        defaultState.addLayer(headTrackingLayer);
+        animationComponent.addAnimationState(defaultState);
+        animationComponent.pushState("default");
+    }
+```
+
+Layers are handled in the order they are added to your state, so when a frame is computed first
+we apply the "locomotion" layer which is a full-body animation blending between
+an idle pose and a running pose based on the speed of the entity. This results in a very vanilla
+like outcome where the legs and arms appear to swing wider the faster the entity is moving.
+The variables here like IDLE_ANIM or RUN_ANIM are simply static resource location names refering
+to animations we have loaded in our animation registry. This is very similar to how
+texture references work for regular entity rendering in vanilla.
+
+#### Full Body Layers
+
+The actual work of the locomotion layer looks like this:
+
+```java
+    void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
+        BakedAnimation baseAnimation = getAnimation(BASE_SLOT);
+        BakedAnimation blendAnimation = getAnimation(SECOND_SLOT);
+        if (baseAnimation != null && blendAnimation != null){
+            InterpolationFramesReturn ret = baseAnimation.getInterpolationFrames(
+                    currentTime - getStartTime(), shouldLoop(), partialTicks);
+            anim1Blend.simpleBlend(ret.current, ret.next, ret.partialTick);
+            InterpolationFramesReturn ret2 = blendAnimation.getInterpolationFrames(
+                    currentTime - getStartTime(), shouldLoop(), partialTicks);
+            anim2Blend.simpleBlend(ret2.current, ret2.next, ret2.partialTick);
+            finalBlend.simpleBlend(anim1Blend.getPose(), anim2Blend.getPose(), getBlendAmount());
+            outPose.copyPose(finalBlend.getPose());
+        }
+    }
+```
+
+First we get the actual BakedAnimation objects and use the getInterpolationFrames function
+to retrieve the current and next frame in our animation. We then use `WeightedAnimationBlend::simpleBlend`
+to produce an in-between pose based on the current `partialTicks`. We then once again
+blend those 2 blends together by the value of `entity.limbSwingAmount`, very similar to how walk 
+cycles are calculated in vanilla Minecraft. Finally, we copy the blended pose to the `outPose` object 
+that will be passed on to subsequent layers.
+
+#### Subtree Layers
+
+Secondly, we apply the "arms" layer. This only affects our skeleton from the "bn_chest" bone and up.
+That way we can use whatever the movement state is from locomotion and the desired arm motion at the same
+time instead of having to produce a walking and standing version of every arm animation we want.
+
+```java
+  void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
+        BakedAnimation animation = getAnimation(BASE_SLOT);
+        if (animation != null){
+            InterpolationFramesReturn ret = animation.getInterpolationFrames(
+                    currentTime - getStartTime(), shouldLoop(), partialTicks);
+            localBlend.setFrames(ret);
+            IPose localPose = localBlend.getPose();
+            for (int id : boneIds){
+                int parentId = skeleton.getBoneIdParentId(id);
+                Matrix4d parentGlobalLoc;
+                if (parentId != -1){
+                    parentGlobalLoc = outPose.getJointMatrix(parentId);
+                } else {
+                    parentGlobalLoc = new Matrix4d();
+                }
+                outPose.setJointMatrix(id, parentGlobalLoc);
+                outPose.getJointMatrix(id).mulAffine(localPose.getJointMatrix(id));
+            }
+        }
+    }
+```
+
+A local blend functions a little differently from the `WeightedAnimationBlend` used in the 
+"locomotion" layer. The largest difference is rather than lerping between the global joint positions
+it lerps between the local joint positions. This is so that we can then take those results and
+apply them to an existing global location from our previous layers and get the arms animation added
+onto the existing animation frame. We begin by getting the interpolated frames just as before, but then we loop through 
+only bones descending from and including the"bn_chest" bone we passed in, 
+applying the local joint matrix to the parent's global joint matrix to get the new global matrix for that joint.
+
+#### Procedural Layers
+
+Sometimes you don't want to pull animation data from a file at all, such as in Minecraft's head tracking. 
+All entities essentially hold state about the pitch and yaw of their head. We want to be able to use our 
+system to do behavior like this as well. Luckily, it is actually quite easy to do so in a skeletal animation
+system:
+
+```java
+public void doLayerWork(IPose basePose, int currentTime, float partialTicks, IPose outPose) {
+        BoneMFSkeleton skeleton = getEntity().getSkeleton();
+        if (skeleton == null){
+            return;
+        }
+        BoneMFNode bone = skeleton.getBone(getBoneName());
+        T entity = getEntity();
+        if (bone != null) {
+            float bodyYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
+            float headYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRotationYawHead, entity.rotationYawHead);
+            boolean shouldSit = entity.isPassenger() && (entity.getRidingEntity() != null &&
+                    entity.getRidingEntity().shouldRiderSit());
+            float netHeadYaw = headYaw - bodyYaw;
+            if (shouldSit && entity.getRidingEntity() instanceof LivingEntity) {
+                LivingEntity livingentity = (LivingEntity) entity.getRidingEntity();
+                bodyYaw = MathHelper.interpolateAngle(partialTicks, livingentity.prevRenderYawOffset,
+                        livingentity.renderYawOffset);
+                netHeadYaw = headYaw - bodyYaw;
+                float wrapped = MathHelper.wrapDegrees(netHeadYaw);
+                if (wrapped < -getRotLimit()) {
+                    wrapped = -getRotLimit();
+                }
+
+                if (wrapped >= getRotLimit()) {
+                    wrapped = getRotLimit();
+                }
+
+                bodyYaw = headYaw - wrapped;
+                if (wrapped * wrapped > 2500.0F) {
+                    bodyYaw += wrapped * 0.2F;
+                }
+                netHeadYaw = headYaw - bodyYaw;
+            }
+            float headPitch = MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch);
+            float rotateY = netHeadYaw * ((float) Math.PI / 180F);
+            boolean isFlying = entity.getTicksElytraFlying() > 4;
+            float rotateX;
+            if (isFlying) {
+                rotateX = (-(float) Math.PI / 4F);
+            } else {
+                rotateX = headPitch * ((float) Math.PI / 180F);
+            }
+            Vector4d headRotation = new Vector4d(rotateX, rotateY, 0.0, 1.0);
+            Matrix4d headTransform = bone.calculateLocalTransform(bone.getTranslation(),
+                    headRotation, bone.getScaling());
+            int boneId = skeleton.getBoneId(getBoneName());
+            int parentBoneId = skeleton.getBoneParentId(getBoneName());
+            Matrix4d parentTransform;
+            if (parentBoneId != -1) {
+                parentTransform = new Matrix4d(outPose.getJointMatrix(parentBoneId));
+            } else {
+                parentTransform = new Matrix4d();
+            }
+            outPose.setJointMatrix(boneId, parentTransform.mulAffine(headTransform));
+        }
+    }
+```
+
+One of the big differences for a procedural animation like this is rather than fetching a BakedAnimation resource
+we fetch the entity's skeleton. From that skeleton we then fetch the bone we care about for animating the head, in this
+case "bn_head" The next part of this code should be familiar to you if you've ever looked into Minecraft's
+animation code. Essentially we determine the pitch and yaw based on various game conditions, and we only want
+the net head yaw as the body also has a yaw so we just want to move the head by the difference between the entity yaw
+and the head yaw. Once we've calculated the rotation, we call ```bone.calculateLocalTransform``` using the bone's 
+already existing translation and scale but passing in our new calculated rotation vector. This will give us
+the new local matrix for the head bone. We then fetch the current global transform of the parent of the bone from
+the outPose and apply the newly created local transform to that to get the new head position.
