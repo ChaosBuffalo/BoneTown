@@ -15,7 +15,6 @@ public class PopStateMessage extends AnimationMessage {
     }
 
     private static void handleMessage(AnimationComponent<?> component, AnimationMessage message){
-        BoneTown.LOGGER.info("Popping state for {}", component.getEntity());
         component.popState();
     }
 
