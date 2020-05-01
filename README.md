@@ -1,5 +1,7 @@
 # BoneTown
 
+[Curseforge Page](https://www.curseforge.com/minecraft/mc-mods/bonetown)
+
 An alternate entity rendering pipeline for Minecraft Forge 1.15.2.
 
 ## Features
