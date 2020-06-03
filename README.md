@@ -2,6 +2,8 @@
 
 [Curseforge Page](https://www.curseforge.com/minecraft/mc-mods/bonetown)
 
+[Discord](https://discord.gg/mCXnxJ4)
+
 An alternate entity rendering pipeline for Minecraft Forge 1.15.2.
 
 ## Features
